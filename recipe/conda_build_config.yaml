@@ -11,3 +11,6 @@ cxx_compiler:
   - gxx                        # [linux]
 cxx_compiler_version:          # [unix]
   - 11                         # [linux64 or aarch64]
+
+channel_targets:
+  - rapidsai-nightly main
