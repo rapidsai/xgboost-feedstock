@@ -17,7 +17,10 @@ source:
   git_url: {{ xgboost_git_repo }}
   git_tag: {{ xgboost_git_ref }}
   patches:
-    - xgboost_master.patch
+    # xgboost patches
+    - 0001-conda-Unbundle-libxgboost.-dll-dylib-so.patch
+    - 0001-Force-endian-flag-in-cross-compilation-mode.patch  # [arm64 or aarch64 or ppc64le]
+    - update_setup_py.patch
 
 build:
   number: {{ build_number }}
