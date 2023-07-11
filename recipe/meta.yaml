@@ -37,12 +37,12 @@ requirements:
     - cmake
     - llvm-openmp  # [osx]
     - ninja
-    - librmm ={{ rapids_version }}  # [not win]
+    - librmm ={{ rapids_version }}  # [linux]
   host:
     - cudatoolkit ={{ cuda_compiler_version }}  # [(cuda_compiler_version or "").startswith("11")]
     - nccl >=2.5                                # [cuda_compiler_version != "None"]
     - llvm-openmp                               # [osx]
-    - librmm ={{ rapids_version }}  # [not win]
+    - librmm ={{ rapids_version }}  # [linux]
 
 
 outputs:
@@ -78,13 +78,13 @@ outputs:
         - make
         - llvm-openmp  # [osx]
       host:
-        - librmm ={{ rapids_version }}  # [not win]
+        - librmm ={{ rapids_version }}  # [linux]
         - nccl >=2.5   # [cuda_compiler_version != "None"]
         - llvm-openmp  # [osx]
         - cudatoolkit  # [(cuda_compiler_version or "").startswith("11")]
       run:
         - {{ pin_compatible('cudatoolkit', max_pin='x', min_pin='x') }}
-        - librmm ={{ rapids_version }}  # [not win]
+        - librmm ={{ rapids_version }}  # [linux]
         - nccl >=2.5   # [cuda_compiler_version != "None"]
       run_constrained:
         - xgboost-proc * {{ xgboost_proc_type }}
