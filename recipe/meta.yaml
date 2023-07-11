@@ -1,19 +1,17 @@
 {% set name = "xgboost" %}
-{% set xgboost_version = environ['XGBOOST_VERSION'] %}
-{% set py_version = environ['CONDA_PY'] %}
-{% set xgboost_gh_org = environ['XGBOOST_GH_ORG'] %}
-{% set xgboost_git_ref = environ['XGBOOST_GIT_REF'] %}
-{% set build_number = environ['XGBOOST_BUILD_NUMBER'] %}
-{% set rapids_version = environ['RAPIDS_VERSION'] %}
+{% set version = "1.7.4" %}
+{% set gh_org = "dmlc" %}
+{% set build_number = "0" %}
+{% set rapids_version = "23.06" %}
 
 package:
   name: {{ name|lower }}-split
-  version: {{ xgboost_version }}
+  version: {{ version }}
 
 source:
   # We have to use git urls here to get the submodules needed for the build
   git_url: https://github.com/{{ gh_org }}/xgboost
-  git_tag: {{ xgboost_git_ref }}
+  git_tag: v{{ version }}
   patches:
     # xgboost patches
     - 0001-conda-Unbundle-libxgboost.-dll-dylib-so.patch
