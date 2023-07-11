@@ -10,6 +10,9 @@ jobs:
     name: ${{ matrix.CONFIG }}
     runs-on: ${{ matrix.os }}-latest
     strategy:
+      # max-parallel to attempt to avoid 429s from many concurrent
+      # 'actions/checkout'
+      max-parallel: 10
       fail-fast: false
       matrix:
         include:
