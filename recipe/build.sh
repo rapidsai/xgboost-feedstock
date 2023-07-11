@@ -1,18 +1,23 @@
 #!/bin/bash
 
-# https://xgboost.readthedocs.io/en/latest/build.html
+set -exuo pipefail
 
+mkdir -p build-target
 
-export CUDF_ROOT="${PREFIX}"
-export NCCL_ROOT="${PREFIX}"
+if [[ ${cuda_compiler_version} != "None" ]]; then
+    GPU_COMPUTE="60;70;75;80;86;90"
+    export CMAKE_ARGS="-DUSE_CUDA=ON -DUSE_NCCL=ON -DBUILD_WITH_SHARED_NCCL=ON -DGPU_COMPUTE_VER=${GPU_COMPUTE} ${CMAKE_ARGS}"
+fi
 
-CUDA_MAJOR=$(echo ${RAPIDS_CUDA_VERSION} | cut -f 1 -d.)
+# Limit number of threads used to avoid hardware oversubscription
+if [[ "${target_platform}" == "linux-aarch64" ]] || [[ "${target_platform}" == "linux-ppc64le" ]]; then
+    export CMAKE_BUILD_PARALLEL_LEVEL=6
+fi
 
-GPU_COMPUTE="60;70;75;80;86;90"
-echo "GPU_COMPUTE=$GPU_COMPUTE"
+pushd build-target
 
-cmake \
-      -G "Unix Makefiles" \
+cmake ${CMAKE_ARGS} \
+      -G "Ninja" \
       -D CMAKE_BUILD_TYPE:STRING="Release" \
       -D CMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON \
       -D CMAKE_INSTALL_PREFIX:PATH="${PREFIX}" \
@@ -31,8 +36,8 @@ cmake \
       -D USE_CUDF:BOOL=ON \
       -D CUDF_ROOT:PATH="${PREFIX}" \
       -D CUDF_INCLUDE_DIR:PATH="${PREFIX}/include" \
-      -D GPU_COMPUTE_VER:STRING="$GPU_COMPUTE" \
       -D PLUGIN_RMM=ON \
       -D RMM_ROOT="${PREFIX}" \
       "${SRC_DIR}"
-make -j${CPU_COUNT} VERBOSE=1
+cmake --build . --config Release
+popd
