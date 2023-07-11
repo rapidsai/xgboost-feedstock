@@ -104,7 +104,6 @@ outputs:
       host:
         - {{ pin_subpackage('libxgboost', exact=True) }}
         - python
-        - rmm ={{ rapids_version }}
         - setuptools
         - pip
       run:
@@ -114,7 +113,6 @@ outputs:
         - scipy
         - pandas >=0.25
         - python
-        - rmm ={{ rapids_version }}
         - scikit-learn
       run_constrained:
         - xgboost-proc * {{ xgboost_proc_type }}
