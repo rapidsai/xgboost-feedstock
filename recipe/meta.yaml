@@ -2,7 +2,7 @@
 {% set version = "1.7.4" %}
 {% set gh_org = "dmlc" %}
 {% set build_number = "0" %}
-{% set rapids_version = "23.06" %}
+{% set rapids_version = "23.06.00" %}
 
 package:
   name: {{ name|lower }}-split
