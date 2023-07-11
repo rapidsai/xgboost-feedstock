@@ -76,6 +76,8 @@ jobs:
     steps:
     - name: Delete huge unnecessary tools folder
       run: rm -rf /opt/hostedtoolcache
+      if: matrix.os == 'ubuntu'
+
     - name: Checkout code
       uses: actions/checkout@v3
 
