@@ -47,6 +47,7 @@ outputs:
       string: rapidsai_cuda{{ cuda_compiler_version | replace('.', '') }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
       ignore_run_exports_from:
         - {{ compiler('cuda') }}  # [(cuda_compiler_version or "").startswith("11")]
+        - nccl                    # [cuda_compiler_version != "None"]
     requirements:
       build:
         - {{ compiler('c') }}
@@ -60,11 +61,13 @@ outputs:
         - llvm-openmp  # [osx]
         - cudatoolkit      # [(cuda_compiler_version or "").startswith("11")]
         - cuda-cudart-dev  # [(cuda_compiler_version or "").startswith("12")]
-        - nccl             # [cuda_compiler_version != "None"]
+        - nccl             # [linux and cuda_compiler_version != "None"]
         - librmm ={{ rapids_version }}  # [linux and cuda_compiler_version != "None"]
       run:
         - llvm-openmp  # [osx]
-        - librmm ={{ rapids_version }}  # [linux and cuda_compiler_version != "None"]
+      run_constrained:
+        - librmm ={{ rapids_version }}               # [linux and cuda_compiler_version != "None"]
+        - {{ pin_compatible("nccl", max_pin="x") }}  # [linux and cuda_compiler_version != "None"]
 
   - name: py-xgboost
     script: install-py-xgboost.sh  # [not win]
@@ -87,6 +90,8 @@ outputs:
         - scipy
         - scikit-learn
     test:
+      requires:
+        - nccl  # [linux and cuda_compiler_version != "None"]
       script: test-py-xgboost.py
       imports:
         - xgboost
@@ -157,6 +162,8 @@ outputs:
         - r-magrittr
         - r-jsonlite
     test:
+      requires:
+        - nccl  # [linux and cuda_compiler_version != "None"]
       files:
         - test-r-xgboost.r
       commands:
