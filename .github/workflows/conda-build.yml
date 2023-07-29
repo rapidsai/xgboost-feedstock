@@ -28,8 +28,8 @@ jobs:
             UPLOAD_PACKAGES: True
             DOCKER_IMAGE: quay.io/condaforge/linux-anvil-cuda:11.2
             os: ubuntu
-          - CONFIG: win_64_cuda_compilernvcccuda_compiler_versionNone
-            SHORT_CONFIG: win_64_cuda_compilernvcccuda_compil_h980e8d0f3a
+          - CONFIG: win_64_cuda_compilerNonecuda_compiler_versionNone
+            SHORT_CONFIG: win_64_cuda_compilerNonecuda_compil_hdd26f212be
             UPLOAD_PACKAGES: True
             os: windows
           - CONFIG: osx_64_
