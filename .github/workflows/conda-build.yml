@@ -28,6 +28,18 @@ jobs:
             UPLOAD_PACKAGES: True
             DOCKER_IMAGE: quay.io/condaforge/linux-anvil-cuda:11.2
             os: ubuntu
+          - CONFIG: win_64_cuda_compilernvcccuda_compiler_versionNone
+            SHORT_CONFIG: win_64_cuda_compilernvcccuda_compil_h980e8d0f3a
+            UPLOAD_PACKAGES: True
+            os: windows
+          - CONFIG: osx_64_
+            SHORT_CONFIG: osx_64_
+            UPLOAD_PACKAGES: True
+            os: macos
+          - CONFIG: osx_arm64_
+            SHORT_CONFIG: osx_arm64_
+            UPLOAD_PACKAGES: True
+            os: macos
     steps:
 
     - name: Manage disk space
