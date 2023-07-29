@@ -35,7 +35,7 @@ requirements:
   host:
     - cudatoolkit      # [(cuda_compiler_version or "").startswith("11")]
     - cuda-cudart-dev  # [(cuda_compiler_version or "").startswith("12")]
-    - nccl             # [cuda_compiler_version != "None"]
+    - nccl             # [linux and cuda_compiler_version != "None"]
     - llvm-openmp  # [osx]
     - librmm ={{ rapids_version }}  # [linux and cuda_compiler_version != "None"]
 
@@ -48,7 +48,7 @@ outputs:
       string: rapidsai_cuda{{ cuda_compiler_version | replace('.', '') }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
       ignore_run_exports_from:
         - {{ compiler('cuda') }}  # [(cuda_compiler_version or "").startswith("11")]
-        - nccl                    # [cuda_compiler_version != "None"]
+        - nccl                    # [linux and cuda_compiler_version != "None"]
     requirements:
       build:
         - {{ compiler('c') }}
