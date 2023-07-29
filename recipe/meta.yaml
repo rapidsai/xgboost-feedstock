@@ -89,9 +89,6 @@ outputs:
         - numpy
         - scipy
         - scikit-learn
-    test:
-      requires:
-        - nccl  # [linux and cuda_compiler_version != "None"]
       script: test-py-xgboost.py
       imports:
         - xgboost
@@ -161,9 +158,6 @@ outputs:
         - r-data.table
         - r-magrittr
         - r-jsonlite
-    test:
-      requires:
-        - nccl  # [linux and cuda_compiler_version != "None"]
       files:
         - test-r-xgboost.r
       commands:
