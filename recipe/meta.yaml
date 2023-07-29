@@ -90,9 +90,10 @@ outputs:
         - numpy
         - scipy
         - scikit-learn
-      script: test-py-xgboost.py
-      imports:
-        - xgboost
+      test:
+        script: test-py-xgboost.py
+        imports:
+          - xgboost
 
   - name: xgboost
     build:
@@ -159,10 +160,11 @@ outputs:
         - r-data.table
         - r-magrittr
         - r-jsonlite
-      files:
-        - test-r-xgboost.r
-      commands:
-        - Rscript test-r-xgboost.r
+      test:
+        files:
+          - test-r-xgboost.r
+        commands:
+          - Rscript test-r-xgboost.r
 
 about:
   home: https://github.com/dmlc/xgboost
