@@ -65,6 +65,7 @@ outputs:
         - nccl             # [linux and cuda_compiler != "None"]
         - librmm ={{ rapids_version }}  # [linux and cuda_compiler != "None"]
       run:
+        - cuda-version >=11.2,<12  # [(cuda_compiler_version or "").startswith("11")]
       run_constrained:
         - librmm ={{ rapids_version }}               # [linux and cuda_compiler != "None"]
         - {{ pin_compatible("nccl", max_pin="x") }}  # [linux and cuda_compiler != "None"]
