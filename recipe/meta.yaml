@@ -98,8 +98,6 @@ outputs:
   - name: xgboost
     build:
       string: rapidsai_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
-      ignore_run_exports_from:
-        - {{ compiler('cuda') }}  # [(cuda_compiler_version or "").startswith("11")]
     requirements:
       host:
         - python
@@ -114,8 +112,6 @@ outputs:
       string: rapidsai_r{{ r_base | replace('.', '') }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
       rpaths:
         - lib/R/lib
-      ignore_run_exports_from:
-        - {{ compiler('cuda') }}  # [(cuda_compiler_version or "").startswith("11")]
     requirements:
       build:
         - {{ compiler('m2w64_c') }}          # [win]
