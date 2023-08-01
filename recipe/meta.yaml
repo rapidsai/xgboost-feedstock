@@ -18,9 +18,9 @@ source:
     - 0001-Force-endian-flag-in-cross-compilation-mode.patch  # [arm64 or aarch64 or ppc64le]
 
 build:
+  number: {{ build_number }}
   skip: true  # [win and cuda_compiler != "None"]
   skip: true  # [linux and cuda_compiler == "None"]
-  number: {{ build_number }}
 
 requirements:
   build:
