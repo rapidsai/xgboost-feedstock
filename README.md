@@ -230,7 +230,6 @@ mamba repoquery whoneeds _py-xgboost-mutex --channel conda-forge
 mamba repoquery depends _py-xgboost-mutex --channel conda-forge
 ```
 
-
 About conda-forge
 =================
 
