@@ -67,7 +67,7 @@ outputs:
         - cuda-version >={{ 11.2 }},<12
         {% endif %}
       run_constrained:
-        - {{ pin_compatible('librmm', max_pin='x.x.x') }}  # [linux and cuda_compiler != "None"]
+        - {{ pin_compatible('librmm', max_pin='x.x') }}  # [linux and cuda_compiler != "None"]
 
   - name: py-xgboost
     script: install-py-xgboost.sh  # [not win]
