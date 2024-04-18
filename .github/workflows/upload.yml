@@ -1,0 +1,46 @@
+name: Release
+on:
+  workflow_run:
+    workflows:
+      - Build conda package
+    types:
+      - completed
+
+jobs:
+  on-success:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == "success" }}
+    steps:
+      - uses: actions/download-artifact@v4
+
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: base
+          conda-solver: libmamba
+          channels:
+            - conda-forge
+          channel-priority: strict
+          show-channel-urls: true
+          miniforge-version: latest
+
+      - name: Conda environment info
+        shell: bash -l {0}
+        run: |
+          conda info
+          conda config --show
+          conda list --show-channel-urls
+
+      - name: Upload packages to `rapidsai-nightly
+        shell: bash -l {0}
+        run: |
+          # Upload packages
+          ls
+
+  on-failure:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == "failure" }}
+    steps:
+      - run: |
+          echo "Building the Conda packages failed"
+          exit 1
+
