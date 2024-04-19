@@ -29,4 +29,3 @@ provider:
   osx: github_actions
   win: github_actions
 test: native_and_emulated
-upload_on_branch: main
