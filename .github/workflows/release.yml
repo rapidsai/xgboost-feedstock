@@ -1,0 +1,48 @@
+name: Release
+on:
+  workflow_run:
+    workflows:
+      - Build conda package
+    branches:
+      - main
+    types:
+      - completed
+
+jobs:
+  on-success:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == "success" }}
+    steps:
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: base
+          conda-solver: libmamba
+          channels:
+            - conda-forge
+          channel-priority: strict
+          show-channel-urls: true
+          miniforge-version: latest
+
+      - name: Copy `rapidsai-nightly` packages to `rapidsai`
+        shell: bash -l {0}
+        run: |
+          # Environment info
+          conda info
+          conda config --show
+          conda list --show-channel-urls
+
+          # Copy over packages
+          VERSION=2.0.3
+          conda server copy --to-owner rapidsai rapidsai-nightly/libxgboost/$VERSION
+          conda server copy --to-owner rapidsai rapidsai-nightly/py-xgboost/$VERSION
+          conda server copy --to-owner rapidsai rapidsai-nightly/r-xgboost/$VERSION
+          conda server copy --to-owner rapidsai rapidsai-nightly/xgboost/$VERSION
+
+  on-failure:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == "failure" }}
+    steps:
+      - run: |
+          echo "Building the Conda packages failed"
+          exit 1
+
