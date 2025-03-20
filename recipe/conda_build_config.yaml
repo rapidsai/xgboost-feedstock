@@ -1,5 +1,5 @@
-librmm:
-  - 25.04
+librmm:            # [linux]
+  - 25.04          # [linux]
 
 channel_sources:
   - rapidsai,rapidsai-nightly,conda-forge
