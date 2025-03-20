@@ -1,5 +1,8 @@
-librmm:
-  - 25.06
+c_stdlib_version:  # [linux]
+  - 2.28           # [linux]
+
+librmm:            # [linux]
+  - 25.06          # [linux]
 
 channel_sources:
   - rapidsai,rapidsai-nightly,conda-forge
