@@ -49,7 +49,7 @@ requirements:
     #                                                                                          #
     # xref: https://github.com/conda-forge/xgboost-feedstock/pull/219#issuecomment-2738813028  #
     ############################################################################################
-    - cccl =2.7             # [cuda_compiler != "None"]
+    - cccl =2.7             # [win and cuda_compiler != "None"]
     - nccl                  # [linux and cuda_compiler != "None"]
     - librmm                # [linux and cuda_compiler != "None"]
 
