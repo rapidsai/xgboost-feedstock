@@ -15,10 +15,6 @@ github_actions:
   artifact_retention_days: 7
   free_disk_space: true
   upload_packages: true
-os_version:
-  linux_64: cos7
-  linux_aarch64: cos7
-  linux_ppc64le: cos7
 provider:
   linux: github_actions
   linux_aarch64: github_actions
