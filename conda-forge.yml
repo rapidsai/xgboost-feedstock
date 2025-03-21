@@ -20,5 +20,8 @@ provider:
   linux_aarch64: github_actions
   osx: github_actions
   win: github_actions
+remote_ci_setup:
+- conda-forge-ci-setup=4
+- conda-build=25.1
 test: native
 upload_on_branch: main
