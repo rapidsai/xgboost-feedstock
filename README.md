@@ -117,4 +117,5 @@ Feedstock Maintainers
 
 * [@hcho3](https://github.com/hcho3/)
 * [@jakirkham](https://github.com/jakirkham/)
+* [@trivialfis](https://github.com/trivialfis/)
 
