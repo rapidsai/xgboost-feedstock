@@ -1,7 +1,7 @@
-From 680878a21a29298f5b0d5ced331598811ec47c87 Mon Sep 17 00:00:00 2001
+From a426830eb2be82b900f1204d1fb190a0b8b58197 Mon Sep 17 00:00:00 2001
 From: jakirkham <jakirkham@gmail.com>
-Date: Wed, 19 Mar 2025 19:40:18 -0700
-Subject: [PATCH] Use RMM's pached CCCL
+Date: Thu, 20 Mar 2025 09:38:32 -0700
+Subject: [PATCH] Use RMM's pached CCCL (3.0.x)
 
 Make sure to search for RMM if it will be used. This should pick up the
 patched CCCL from RMM.
@@ -9,19 +9,21 @@ patched CCCL from RMM.
 If RMM is not being used and this is a CUDA build, search for CCCL
 explicitly.
 ---
- CMakeLists.txt | 40 ++++++++++++++++++++++------------------
- 1 file changed, 22 insertions(+), 18 deletions(-)
+ CMakeLists.txt | 52 +++++++++++++++++++++++++++-----------------------
+ 1 file changed, 28 insertions(+), 24 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 5fb464b67..177999a50 100644
+index 8dfe7dd9e048..091440ab6814 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -224,24 +224,6 @@ if(USE_CUDA)
-   add_subdirectory(${PROJECT_SOURCE_DIR}/gputreeshap)
+@@ -229,30 +229,6 @@ if(USE_CUDA)
+   endif()
  
    find_package(CUDAToolkit REQUIRED)
 -  find_package(CCCL CONFIG)
--  if(NOT CCCL_FOUND)
+-  if(CCCL_FOUND)
+-    message(STATUS "Standalone CCCL found.")
+-  else()
 -    message(STATUS "Standalone CCCL not found. Attempting to use CCCL from CUDA Toolkit...")
 -    find_package(CCCL CONFIG
 -      HINTS ${CUDAToolkit_LIBRARY_DIR}/cmake)
@@ -38,10 +40,14 @@ index 5fb464b67..177999a50 100644
 -      target_link_libraries(CCCL::CCCL INTERFACE libcudacxx::libcudacxx CUB::CUB Thrust)
 -    endif()
 -  endif()
+-  # Define guard macros to prevent windows.h from conflicting with winsock2.h
+-  if(WIN32)
+-    target_compile_definitions(CCCL::CCCL INTERFACE NOMINMAX WIN32_LEAN_AND_MEAN _WINSOCKAPI_)
+-  endif()
  endif()
  
  if(FORCE_COLORED_OUTPUT AND (CMAKE_GENERATOR STREQUAL "Ninja") AND
-@@ -327,6 +309,28 @@ if(PLUGIN_RMM)
+@@ -338,6 +314,34 @@ if(PLUGIN_RMM)
    list(REMOVE_ITEM rmm_link_libs CUDA::cudart)
    list(APPEND rmm_link_libs CUDA::cudart_static)
    set_target_properties(rmm::rmm PROPERTIES INTERFACE_LINK_LIBRARIES "${rmm_link_libs}")
@@ -50,7 +56,9 @@ index 5fb464b67..177999a50 100644
 +elseif(USE_CUDA)
 +  # If using CUDA and not RMM, search for CCCL.
 +  find_package(CCCL CONFIG)
-+  if(NOT CCCL_FOUND)
++  if(CCCL_FOUND)
++    message(STATUS "Standalone CCCL found.")
++  else()
 +    message(STATUS "Standalone CCCL not found. Attempting to use CCCL from CUDA Toolkit...")
 +    find_package(CCCL CONFIG
 +      HINTS ${CUDAToolkit_LIBRARY_DIR}/cmake)
@@ -67,9 +75,10 @@ index 5fb464b67..177999a50 100644
 +      target_link_libraries(CCCL::CCCL INTERFACE libcudacxx::libcudacxx CUB::CUB Thrust)
 +    endif()
 +  endif()
++  # Define guard macros to prevent windows.h from conflicting with winsock2.h
++  if(WIN32)
++    target_compile_definitions(CCCL::CCCL INTERFACE NOMINMAX WIN32_LEAN_AND_MEAN _WINSOCKAPI_)
++  endif()
  endif()
  
  if(PLUGIN_SYCL)
--- 
-2.49.0
-
