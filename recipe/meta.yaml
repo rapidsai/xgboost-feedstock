@@ -1,5 +1,7 @@
-{% set version = "2.1.4" %}
-{% set build_number = 4 %}
+{% set version = "3.0.0" %}
+{% set build_number = 0 %}
+{% set python_min = "3.10" %}
+{% set posix = 'm2-' if win else '' %}
 
 {% set string_prefix = "rapidsai" %}
 
@@ -8,8 +10,8 @@ package:
   version: {{ version }}
 
 source:
-  url: https://github.com/dmlc/xgboost/releases/download/v{{ version }}/xgboost-{{ version }}.tar.gz
-  sha256: b6ce5870d03cc1233cad5ff8460f670a2aff78625adfb578c0b9eec3b8b88406
+  url: https://github.com/dmlc/xgboost/releases/download/v{{ version }}/xgboost-src-{{ version }}.tar.gz
+  sha256: 431222b47085b9c3504d77ef59cfa23ae4fe9d701085313f47217e49e8823326
   patches:
     # xgboost patches
     - patches/0001-Enable-latest-libcxx-on-MacOS.patch                # [osx]
@@ -25,9 +27,9 @@ build:
   # So packages built with CUDA 12.8 work for all CUDA 12.x versions.
   # ref: https://docs.nvidia.com/deploy/cuda-compatibility/index.html
   #
-  # Windows CUDA 11.8 fails due to a compilation error
-  # xref: https://github.com/conda-forge/xgboost-feedstock/issues/173
-  skip: true  # [((linux or win) and cuda_compiler_version == "None") or (python_min is undefined) or (cuda_compiler_version == "12.6") or (win and cuda_compiler_version == "11.8")]
+  # XGBoost 3 dropped CUDA 11 support.
+  # xref: https://github.com/dmlc/xgboost/issues/10370
+  skip: true  # [((linux or win) and cuda_compiler_version == "None") or (python_min is undefined) or (cuda_compiler_version == "12.6") or (cuda_compiler_version == "11.8")]
 
 requirements:
   build:
@@ -164,7 +166,7 @@ outputs:
 
   - name: r-xgboost
     script: >-
-      {{ "install-r-xgboost.sh" if not win else "install-r-xgboost.bat" }}
+      {{ "install-r-xgboost.sh" if not win else "install-win-wrapper.bat" }}
     build:
       skip: true  # [r_base in ("4.1", "4.2")]
       string: {{ string_prefix }}_r{{ r_base | replace('.', '') }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
@@ -186,11 +188,9 @@ outputs:
         - {{ stdlib('m2w64_c') }}          # [win]
         - llvm-openmp                      # [osx]
         - libgomp                          # [linux or win]
-        - m2-bash                          # [win]
-        - git
-        - make
-        - cmake
-        - ninja
+        - {{ posix }}bash                  # [win]
+        - {{ posix }}git
+        - {{ posix }}make
         - cross-r-base {{ r_base }}        # [build_platform != target_platform]
         - r-base                           # [build_platform != target_platform]
         - r-matrix                         # [build_platform != target_platform]
@@ -223,7 +223,9 @@ outputs:
       files:
         - test-r-xgboost.r
       commands:
-        - Rscript test-r-xgboost.r  # [not win]
+        - $R -e "library('xgboost')"           # [unix]
+        - "\"%R%\" -e \"library('xgboost')\""  # [win]
+        - Rscript test-r-xgboost.r             # [unix]
 
 about:
   home: https://github.com/dmlc/xgboost
