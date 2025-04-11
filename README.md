@@ -115,12 +115,7 @@ In order to produce a uniquely identifiable distribution:
 Feedstock Maintainers
 =====================
 
-* [@aldanor](https://github.com/aldanor/)
-* [@danielnachun](https://github.com/danielnachun/)
-* [@fhoehle](https://github.com/fhoehle/)
 * [@hcho3](https://github.com/hcho3/)
 * [@jakirkham](https://github.com/jakirkham/)
-* [@ksangeek](https://github.com/ksangeek/)
-* [@mfansler](https://github.com/mfansler/)
-* [@xhochy](https://github.com/xhochy/)
+* [@trivialfis](https://github.com/trivialfis/)
 

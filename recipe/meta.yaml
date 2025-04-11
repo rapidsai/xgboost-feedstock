@@ -1,5 +1,5 @@
 {% set version = "2.1.4" %}
-{% set build_number = 3 %}
+{% set build_number = 4 %}
 
 {% set string_prefix = "rapidsai" %}
 
@@ -245,11 +245,6 @@ about:
 extra:
   feedstock-name: xgboost
   recipe-maintainers:
+    - trivialfis
     - hcho3
-    - aldanor
-    - danielnachun
-    - fhoehle
     - jakirkham
-    - ksangeek
-    - xhochy
-    - mfansler
