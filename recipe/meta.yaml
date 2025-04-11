@@ -246,10 +246,4 @@ extra:
   feedstock-name: xgboost
   recipe-maintainers:
     - hcho3
-    - aldanor
-    - danielnachun
-    - fhoehle
     - jakirkham
-    - ksangeek
-    - xhochy
-    - mfansler
