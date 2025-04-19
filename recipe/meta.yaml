@@ -1,5 +1,5 @@
 {% set version = "3.0.0" %}
-{% set build_number = 0 %}
+{% set build_number = 1 %}
 {% set python_min = "3.10" %}
 {% set posix = 'm2-' if win else '' %}
 
@@ -78,9 +78,8 @@ outputs:
         - {{ compiler('cxx') }}
         - {{ compiler('cuda') }}  # [cuda_compiler != "None"]
         - {{ stdlib('c') }}
-        - git
         - cmake
-        - make
+        - ninja
         - llvm-openmp  # [osx]
         - libgomp      # [linux or win]
       host:
@@ -96,7 +95,10 @@ outputs:
     test:
       commands:
         - test -f "${PREFIX}/lib/libxgboost${SHLIB_EXT}"                  # [unix]
+        - test -d "${PREFIX}/lib/cmake"                                   # [unix]
+        - if not exist %LIBRARY_PREFIX%\mingw-w64\lib\xgboost.lib exit 1  # [win]
         - if not exist %LIBRARY_PREFIX%\mingw-w64\bin\xgboost.dll exit 1  # [win]
+        - if not exist %LIBRARY_PREFIX%\mingw-w64\lib\cmake exit 1        # [win]
 
   - name: py-xgboost
     script: >-
@@ -188,7 +190,6 @@ outputs:
         - llvm-openmp                      # [osx]
         - libgomp                          # [linux or win]
         - {{ posix }}bash                  # [win]
-        - {{ posix }}git
         - {{ posix }}make
         - cross-r-base {{ r_base }}        # [build_platform != target_platform]
         - r-base                           # [build_platform != target_platform]
