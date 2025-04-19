@@ -14,7 +14,7 @@ fi
 
 if [[ ${cuda_compiler_version} != "None" ]]; then
     XGB_CMAKE_ARGS=(-DUSE_CUDA=ON -DUSE_NCCL=ON -DBUILD_WITH_SHARED_NCCL=ON ${XGB_CMAKE_ARGS[@]+"${XGB_CMAKE_ARGS[@]}"} )
-    XGB_CMAKE_ARGS=(-DBUILD_WITH_CUDA_CUB=ON -DPLUGIN_RMM=ON ${XGB_CMAKE_ARGS[@]+"${XGB_CMAKE_ARGS[@]}"} )
+    XGB_CMAKE_ARGS=(-DPLUGIN_RMM=ON ${XGB_CMAKE_ARGS[@]+"${XGB_CMAKE_ARGS[@]}"} )
 fi
 
 # Limit number of threads used to avoid hardware oversubscription
