@@ -84,10 +84,9 @@ outputs:
         - llvm-openmp  # [osx]
         - libgomp      # [linux or win]
       host:
-        - cuda-version {{ cuda_compiler_version }}       # [cuda_compiler != "None"]
-        - nccl                                           # [linux and cuda_compiler != "None"]
-        - librmm                                         # [linux and cuda_compiler != "None"]
-        - libgomp                                        # [win]
+        - cuda-version {{ cuda_compiler_version }}  # [cuda_compiler != "None"]
+        - nccl                                      # [linux and cuda_compiler != "None"]
+        - libgomp                                   # [win]
       run:
         - {{ pin_compatible("cuda-version", lower_bound="11.2") }}  # [cuda_compiler == "nvcc"]
         - {{ pin_compatible("cuda-version", min_pin="x") }}         # [cuda_compiler == "cuda-nvcc"]
