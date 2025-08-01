@@ -1,4 +1,4 @@
-{% set version = "3.0.2" %}
+{% set version = "3.0.3" %}
 {% set build_number = 0 %}
 {% set python_min = "3.10" %}
 {% set posix = 'm2-' if win else '' %}
@@ -11,7 +11,7 @@ package:
 
 source:
   url: https://github.com/dmlc/xgboost/releases/download/v{{ version }}/xgboost-src-{{ version }}.tar.gz
-  sha256: 8f909899f5dc64d4173662a3efa307100713e3c2e2b831177c2e56af0e816caf
+  sha256: 6598adf6a073a55cc87a31e6712fc6dab938a5317aeae7134a07067d51acdf3a
   patches:
     # xgboost patches
     - patches/0001-Enable-latest-libcxx-on-MacOS.patch                # [osx]
@@ -23,19 +23,16 @@ build:
   number: {{ build_number }}
   # Skip if `python_min` is undefined. This ensures re-rendering picks it up.
   #
-  # Skip CUDA 12.6 in favor of 12.8. This package supports CUDA Compatibility.
-  # So packages built with CUDA 12.8 work for all CUDA 12.x versions.
+  # Skip CUDA 12.6 in favor of 12.9. This package supports CUDA Compatibility.
+  # So packages built with CUDA 12.9 work for all CUDA 12.x versions.
   # ref: https://docs.nvidia.com/deploy/cuda-compatibility/index.html
-  #
-  # XGBoost 3 dropped CUDA 11 support.
-  # xref: https://github.com/dmlc/xgboost/issues/10370
-  skip: true  # [((linux or win) and cuda_compiler_version == "None") or (not python_min) or (cuda_compiler_version == "12.6") or (cuda_compiler_version == "11.8")]
+  skip: true  # [((linux or win) and cuda_compiler_version == "None") or (not python_min) or (cuda_compiler_version == "12.6")]
 
 requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - {{ compiler('cuda') }}           # [cuda_compiler != "None" and cuda_compiler_version != "None"]
+    - {{ compiler('cuda') }}           # [cuda_compiler_version != "None"]
     - {{ compiler('m2w64_c') }}        # [win]
     - {{ compiler('m2w64_cxx') }}      # [win]
     - {{ stdlib('c') }}
@@ -46,14 +43,14 @@ requirements:
     - libgomp      # [linux or win]
     - ninja
   host:
-    ############################################################################################
-    # Pin to CCCL 2.7 to avoid build issues in older or newer CCCLs.                           #
-    #                                                                                          #
-    # xref: https://github.com/conda-forge/xgboost-feedstock/pull/219#issuecomment-2738813028  #
-    ############################################################################################
-    - cccl =2.7             # [win and cuda_compiler != "None"]
-    - nccl                  # [linux and cuda_compiler != "None"]
-    - librmm                # [linux and cuda_compiler != "None"]
+    #######################################################################
+    # Only use CCCL on Windows as RMM provides the CCCL we use on Linux.  #
+    #                                                                     #
+    # xref: https://github.com/rapidsai/xgboost-feedstock/pull/85         #
+    #######################################################################
+    - cccl                  # [win and cuda_compiler_version != "None"]
+    - nccl                  # [linux and cuda_compiler_version != "None"]
+    - librmm                # [linux and cuda_compiler_version != "None"]
 
 outputs:
   - name: libxgboost
@@ -63,7 +60,7 @@ outputs:
       activate_in_script: true
       string: {{ string_prefix }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
       ignore_run_exports_from:
-        - {{ compiler('cuda') }}  # [cuda_compiler != "None"]
+        - {{ compiler('cuda') }}  # [cuda_compiler_version != "None"]
       missing_dso_whitelist:
         # Conda-build raises the missing `R.dll` linkage erroneously.
         # xref: https://github.com/conda/conda-build/pull/4786
@@ -75,20 +72,19 @@ outputs:
       build:
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
-        - {{ compiler('cuda') }}  # [cuda_compiler != "None"]
+        - {{ compiler('cuda') }}  # [cuda_compiler_version != "None"]
         - {{ stdlib('c') }}
         - cmake
         - ninja
         - llvm-openmp  # [osx]
         - libgomp      # [linux or win]
       host:
-        - cuda-version {{ cuda_compiler_version }}  # [cuda_compiler != "None"]
-        - nccl                                      # [linux and cuda_compiler != "None"]
-        - librmm                                    # [linux and cuda_compiler != "None"]
+        - cuda-version {{ cuda_compiler_version }}  # [cuda_compiler_version != "None"]
+        - nccl                                      # [linux and cuda_compiler_version != "None"]
+        - librmm                                    # [linux and cuda_compiler_version != "None"]
         - libgomp                                   # [win]
       run:
-        - {{ pin_compatible("cuda-version", lower_bound="11.2") }}  # [cuda_compiler == "nvcc"]
-        - {{ pin_compatible("cuda-version", min_pin="x") }}         # [cuda_compiler == "cuda-nvcc"]
+        - {{ pin_compatible("cuda-version", min_pin="x") }}         # [cuda_compiler_version != "None"]
         - libgomp                                                   # [win]
     test:
       commands:
