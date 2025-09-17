@@ -3,7 +3,7 @@ c_compiler:
 c_stdlib:
 - vs
 channel_sources:
-- rapidsai,rapidsai-nightly,conda-forge
+- rapidsai-nightly,rapidsai,conda-forge
 channel_targets:
 - rapidsai-nightly main
 cuda_compiler:
