@@ -19,6 +19,7 @@ source:
     - patches/0003-Mark-wheels-as-any-platform-compatible.patch
     - patches/0004-Disable-glibc-version-check.patch
     - patches/0005-Patch-CMake-config-to-support-CUDA-13.0.patch
+    - patches/0006-Update-RMM-include-paths-and-allocation-interface.patch  # [linux and cuda_compiler_version != "None"]
 
 build:
   number: {{ build_number }}
