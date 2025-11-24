@@ -167,67 +167,67 @@ outputs:
       imports:
         - xgboost
 
-  - name: r-xgboost
-    script: >-
-      {{ "install-r-xgboost.sh" if not win else "install-win-wrapper.bat" }}
-    build:
-      skip: true  # [r_base in ("4.1", "4.2")]
-      string: {{ string_prefix }}_r{{ r_base | replace('.', '') }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
-      rpaths:
-        - lib/R/lib
-      force_use_keys:
-        - librmm                  # [linux and cuda_compiler != "None"]
-      missing_dso_whitelist:
-        # Conda-build raises the missing `ld64.so.2` linkage erroneously.
-        # xref: https://github.com/conda/conda-build/issues/5403
-        - $RPATH/ld64.so.2  # [ppc64le]
-    requirements:
-      build:
-        - {{ compiler('c') }}              # [unix]
-        - {{ compiler('cxx') }}            # [unix]
-        - {{ compiler('m2w64_c') }}        # [win]
-        - {{ compiler('m2w64_cxx') }}      # [win]
-        - {{ stdlib('c') }}                # [unix]
-        - {{ stdlib('m2w64_c') }}          # [win]
-        - llvm-openmp                      # [osx]
-        - libgomp                          # [linux or win]
-        - {{ posix }}bash                  # [win]
-        - {{ posix }}make
-        - cross-r-base {{ r_base }}        # [build_platform != target_platform]
-        - r-base                           # [build_platform != target_platform]
-        - r-matrix                         # [build_platform != target_platform]
-        - r-data.table                     # [build_platform != target_platform]
-        - r-magrittr                       # [build_platform != target_platform]
-        - r-jsonlite                       # [build_platform != target_platform]
-        - r-knitr                          # [build_platform != target_platform]
-      host:
-        - {{ pin_subpackage('libxgboost', max_pin='x.x.x') }}
-        - libgomp                                                  # [win]
-        - libxgboost =*={{ string_prefix }}_h*_{{ PKG_BUILDNUM }}
-        - r-base
-        - r-matrix
-        - r-data.table
-        - r-magrittr
-        - r-jsonlite
-        - r-knitr
-      run:
-        - {{ pin_subpackage('libxgboost', max_pin='x.x.x') }}
-        - libgomp                                                  # [win]
-        - libxgboost =*={{ string_prefix }}_h*_{{ PKG_BUILDNUM }}
-        - r-base
-        - r-matrix
-        - r-data.table
-        - r-magrittr
-        - r-jsonlite
-    test:
-      requires:
-        - r-base
-      files:
-        - test-r-xgboost.r
-      commands:
-        - $R -e "library('xgboost')"           # [unix]
-        - "\"%R%\" -e \"library('xgboost')\""  # [win]
-        - Rscript test-r-xgboost.r             # [unix]
+  #- name: r-xgboost
+  #  script: >-
+  #    {{ "install-r-xgboost.sh" if not win else "install-win-wrapper.bat" }}
+  #  build:
+  #    skip: true  # [r_base in ("4.1", "4.2")]
+  #    string: {{ string_prefix }}_r{{ r_base | replace('.', '') }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+  #    rpaths:
+  #      - lib/R/lib
+  #    force_use_keys:
+  #      - librmm                  # [linux and cuda_compiler != "None"]
+  #    missing_dso_whitelist:
+  #      # Conda-build raises the missing `ld64.so.2` linkage erroneously.
+  #      # xref: https://github.com/conda/conda-build/issues/5403
+  #      - $RPATH/ld64.so.2  # [ppc64le]
+  #  requirements:
+  #    build:
+  #      - {{ compiler('c') }}              # [unix]
+  #      - {{ compiler('cxx') }}            # [unix]
+  #      - {{ compiler('m2w64_c') }}        # [win]
+  #      - {{ compiler('m2w64_cxx') }}      # [win]
+  #      - {{ stdlib('c') }}                # [unix]
+  #      - {{ stdlib('m2w64_c') }}          # [win]
+  #      - llvm-openmp                      # [osx]
+  #      - libgomp                          # [linux or win]
+  #      - {{ posix }}bash                  # [win]
+  #      - {{ posix }}make
+  #      - cross-r-base {{ r_base }}        # [build_platform != target_platform]
+  #      - r-base                           # [build_platform != target_platform]
+  #      - r-matrix                         # [build_platform != target_platform]
+  #      - r-data.table                     # [build_platform != target_platform]
+  #      - r-magrittr                       # [build_platform != target_platform]
+  #      - r-jsonlite                       # [build_platform != target_platform]
+  #      - r-knitr                          # [build_platform != target_platform]
+  #    host:
+  #      - {{ pin_subpackage('libxgboost', max_pin='x.x.x') }}
+  #      - libgomp                                                  # [win]
+  #      - libxgboost =*={{ string_prefix }}_h*_{{ PKG_BUILDNUM }}
+  #      - r-base
+  #      - r-matrix
+  #      - r-data.table
+  #      - r-magrittr
+  #      - r-jsonlite
+  #      - r-knitr
+  #    run:
+  #      - {{ pin_subpackage('libxgboost', max_pin='x.x.x') }}
+  #      - libgomp                                                  # [win]
+  #      - libxgboost =*={{ string_prefix }}_h*_{{ PKG_BUILDNUM }}
+  #      - r-base
+  #      - r-matrix
+  #      - r-data.table
+  #      - r-magrittr
+  #      - r-jsonlite
+  #  test:
+  #    requires:
+  #      - r-base
+  #    files:
+  #      - test-r-xgboost.r
+  #    commands:
+  #      - $R -e "library('xgboost')"           # [unix]
+  #      - "\"%R%\" -e \"library('xgboost')\""  # [win]
+  #      - Rscript test-r-xgboost.r             # [unix]
 
 about:
   home: https://github.com/dmlc/xgboost
