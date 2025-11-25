@@ -1,0 +1,75 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Bradley Dice <bdice@nvidia.com>
+Date: Thu, 21 Nov 2025 00:00:00 +0000
+Subject: [PATCH] Update RMM include paths and allocation interface
+
+RMM 25.12 reorganizes the mr/ directory by removing the device/ subdirectory
+and changes allocate/deallocate method signatures to be stream-ordered.
+
+RMM allocation APIs are changing to align with the new CCCL memory resource
+interface. This updates include paths from rmm/mr/device/*.hpp to rmm/mr/*.hpp
+and updates allocate/deallocate calls to use the new parameter order.
+
+Ref: https://github.com/rapidsai/rmm/issues/2141
+Ref: https://github.com/rapidsai/rmm/issues/2126
+---
+ src/common/device_vector.cuh | 10 +++++-----
+ tests/cpp/helpers.cc         |  6 +++---
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/src/common/device_vector.cuh b/src/common/device_vector.cuh
+index 352ebf371..453addffb 100644
+--- a/src/common/device_vector.cuh
++++ b/src/common/device_vector.cuh
+@@ -9,9 +9,9 @@
+ #if defined(XGBOOST_USE_RMM) && XGBOOST_USE_RMM == 1
+ #include <rmm/device_uvector.hpp>                      // for device_uvector
+ #include <rmm/exec_policy.hpp>                         // for exec_policy_nosync
+-#include <rmm/mr/device/device_memory_resource.hpp>    // for device_memory_resource
+-#include <rmm/mr/device/per_device_resource.hpp>       // for get_current_device_resource
+-#include <rmm/mr/device/thrust_allocator_adaptor.hpp>  // for thrust_allocator
++#include <rmm/mr/device_memory_resource.hpp>    // for device_memory_resource
++#include <rmm/mr/per_device_resource.hpp>       // for get_current_device_resource
++#include <rmm/mr/thrust_allocator_adaptor.hpp>  // for thrust_allocator
+ #include <rmm/version_config.hpp>                      // for RMM_VERSION_MAJOR
+ 
+ #include "xgboost/global_config.h"  // for GlobalConfigThreadLocalStore
+@@ -410,7 +410,7 @@ class LoggingResource : public rmm::mr::device_memory_resource {
+ 
+   void *do_allocate(std::size_t bytes, rmm::cuda_stream_view stream) override {  // NOLINT
+     try {
+-      auto const ptr = mr_->allocate(bytes, stream);
++      auto const ptr = mr_->allocate(stream, bytes);
+       GlobalMemoryLogger().RegisterAllocation(bytes);
+       return ptr;
+     } catch (rmm::bad_alloc const &e) {
+@@ -420,8 +420,8 @@ class LoggingResource : public rmm::mr::device_memory_resource {
+   }
+ 
+   void do_deallocate(void *ptr, std::size_t bytes,  // NOLINT
+-                     rmm::cuda_stream_view stream) override {
+-    mr_->deallocate(ptr, bytes, stream);
++                     rmm::cuda_stream_view stream) noexcept override {
++    mr_->deallocate(stream, ptr, bytes);
+     GlobalMemoryLogger().RegisterDeallocation(bytes);
+   }
+ 
+diff --git a/tests/cpp/helpers.cc b/tests/cpp/helpers.cc
+index 7e2e79ba5..d71a353aa 100644
+--- a/tests/cpp/helpers.cc
++++ b/tests/cpp/helpers.cc
+@@ -26,9 +26,9 @@
+ #if defined(XGBOOST_USE_RMM) && XGBOOST_USE_RMM == 1
+ #include <memory>
+ #include <vector>
+-#include "rmm/mr/device/per_device_resource.hpp"
+-#include "rmm/mr/device/cuda_memory_resource.hpp"
+-#include "rmm/mr/device/pool_memory_resource.hpp"
++#include "rmm/mr/per_device_resource.hpp"
++#include "rmm/mr/cuda_memory_resource.hpp"
++#include "rmm/mr/pool_memory_resource.hpp"
+ #endif  // defined(XGBOOST_USE_RMM) && XGBOOST_USE_RMM == 1
+ 
+ bool FileExists(const std::string& filename) {
+-- 
+2.47.0
