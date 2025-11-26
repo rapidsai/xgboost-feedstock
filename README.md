@@ -37,7 +37,6 @@ Current release info
 | --- | --- | --- | --- |
 | [![Conda Recipe](https://img.shields.io/badge/recipe-libxgboost-green.svg)](https://anaconda.org/rapidsai-nightly/libxgboost) | [![Conda Downloads](https://img.shields.io/conda/dn/rapidsai-nightly/libxgboost.svg)](https://anaconda.org/rapidsai-nightly/libxgboost) | [![Conda Version](https://img.shields.io/conda/vn/rapidsai-nightly/libxgboost.svg)](https://anaconda.org/rapidsai-nightly/libxgboost) | [![Conda Platforms](https://img.shields.io/conda/pn/rapidsai-nightly/libxgboost.svg)](https://anaconda.org/rapidsai-nightly/libxgboost) |
 | [![Conda Recipe](https://img.shields.io/badge/recipe-py--xgboost-green.svg)](https://anaconda.org/rapidsai-nightly/py-xgboost) | [![Conda Downloads](https://img.shields.io/conda/dn/rapidsai-nightly/py-xgboost.svg)](https://anaconda.org/rapidsai-nightly/py-xgboost) | [![Conda Version](https://img.shields.io/conda/vn/rapidsai-nightly/py-xgboost.svg)](https://anaconda.org/rapidsai-nightly/py-xgboost) | [![Conda Platforms](https://img.shields.io/conda/pn/rapidsai-nightly/py-xgboost.svg)](https://anaconda.org/rapidsai-nightly/py-xgboost) |
-| [![Conda Recipe](https://img.shields.io/badge/recipe-r--xgboost-green.svg)](https://anaconda.org/rapidsai-nightly/r-xgboost) | [![Conda Downloads](https://img.shields.io/conda/dn/rapidsai-nightly/r-xgboost.svg)](https://anaconda.org/rapidsai-nightly/r-xgboost) | [![Conda Version](https://img.shields.io/conda/vn/rapidsai-nightly/r-xgboost.svg)](https://anaconda.org/rapidsai-nightly/r-xgboost) | [![Conda Platforms](https://img.shields.io/conda/pn/rapidsai-nightly/r-xgboost.svg)](https://anaconda.org/rapidsai-nightly/r-xgboost) |
 | [![Conda Recipe](https://img.shields.io/badge/recipe-xgboost-green.svg)](https://anaconda.org/rapidsai-nightly/xgboost) | [![Conda Downloads](https://img.shields.io/conda/dn/rapidsai-nightly/xgboost.svg)](https://anaconda.org/rapidsai-nightly/xgboost) | [![Conda Version](https://img.shields.io/conda/vn/rapidsai-nightly/xgboost.svg)](https://anaconda.org/rapidsai-nightly/xgboost) | [![Conda Platforms](https://img.shields.io/conda/pn/rapidsai-nightly/xgboost.svg)](https://anaconda.org/rapidsai-nightly/xgboost) |
 
 Installing xgboost
@@ -50,16 +49,16 @@ conda config --add channels rapidsai-nightly
 conda config --set channel_priority strict
 ```
 
-Once the `rapidsai-nightly` channel has been enabled, `libxgboost, py-xgboost, r-xgboost, xgboost` can be installed with `conda`:
+Once the `rapidsai-nightly` channel has been enabled, `libxgboost, py-xgboost, xgboost` can be installed with `conda`:
 
 ```
-conda install libxgboost py-xgboost r-xgboost xgboost
+conda install libxgboost py-xgboost xgboost
 ```
 
 or with `mamba`:
 
 ```
-mamba install libxgboost py-xgboost r-xgboost xgboost
+mamba install libxgboost py-xgboost xgboost
 ```
 
 It is possible to list all of the versions of `libxgboost` available on your platform with `conda`:
@@ -102,7 +101,7 @@ merged, the recipe will be re-built and uploaded automatically to the
 everybody to install and use from the `rapidsai-nightly` channel.
 Note that all branches in the conda-forge/xgboost-feedstock are
 immediately built and any created packages are uploaded, so PRs should be based
-on branches in forks and branches in the main repository should only be used to
+on branches in forks, and branches in the main repository should only be used to
 build distinct package versions.
 
 In order to produce a uniquely identifiable distribution:

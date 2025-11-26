@@ -46,11 +46,11 @@ jobs:
           - CONFIG: osx_64_
             UPLOAD_PACKAGES: True
             os: macos
-            runs_on: ['macos-13']
+            runs_on: ['macos-15-intel']
           - CONFIG: osx_arm64_
             UPLOAD_PACKAGES: True
             os: macos
-            runs_on: ['macos-13']
+            runs_on: ['macos-15-intel']
           - CONFIG: win_64_cuda_compiler_version12.9
             UPLOAD_PACKAGES: True
             os: windows
@@ -77,15 +77,16 @@ jobs:
                  ; do
           sudo rsync --stats -a --delete /opt/empty_dir/ $d || true
         done
-        sudo apt-get purge -y -f firefox \
-                                 google-chrome-stable \
-                                 microsoft-edge-stable
+        BROWSERS="firefox google-chrome-stable microsoft-edge-stable"
+        BROWSERS_TO_REMOVE=$(dpkg --get-selections $BROWSERS 2>/dev/null | awk '{print $1}')
+        sudo apt-get remove --purge -y $BROWSERS_TO_REMOVE
+
         sudo apt-get autoremove -y >& /dev/null
         sudo apt-get autoclean -y >& /dev/null
         df -h
 
     - name: Checkout code
-      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
 
     - name: Build on Linux
       id: build-linux
