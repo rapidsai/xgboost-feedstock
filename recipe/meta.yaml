@@ -19,6 +19,7 @@ source:
     - patches/0003-Mark-wheels-as-any-platform-compatible.patch
     - patches/0004-Disable-glibc-version-check.patch
     - patches/0005-Update-RMM-include-paths-and-allocation-interface.patch  # [linux and cuda_compiler_version != "None"]
+    - patches/0006-Update-for-CCCL-3.2-compatibility.patch
 
 build:
   number: {{ build_number }}
