@@ -1,0 +1,334 @@
+# This patch updates XGBoost for CCCL 3.2 compatibility.
+# Partially derived from: https://github.com/dmlc/xgboost/pull/11861
+#
+diff --git a/src/common/device_helpers.cuh b/src/common/device_helpers.cuh
+index dbea513..5c1896d 100644
+--- a/src/common/device_helpers.cuh
++++ b/src/common/device_helpers.cuh
+@@ -16,6 +16,7 @@
+ #include <algorithm>
+ #include <cstddef>  // for size_t
+ #include <cub/cub.cuh>
++#include <cuda/std/utility>   // for pair
+ #include <cub/util_type.cuh>  // for UnitWord, DoubleBuffer
+ #include <variant>            // for variant, visit
+ #include <vector>             // for vector
+@@ -615,12 +616,12 @@ size_t SegmentedUnique(const thrust::detail::execution_policy_base<DerivedPolicy
+                        KeyInIt key_segments_first, KeyInIt key_segments_last, ValInIt val_first,
+                        ValInIt val_last, KeyOutIt key_segments_out, ValOutIt val_out,
+                        CompValue comp, CompKey comp_key = thrust::equal_to<size_t>{}) {
+-  using Key = thrust::pair<size_t, typename thrust::iterator_traits<ValInIt>::value_type>;
++  using Key = cuda::std::pair<size_t, typename thrust::iterator_traits<ValInIt>::value_type>;
+   auto unique_key_it = dh::MakeTransformIterator<Key>(
+       thrust::make_counting_iterator(static_cast<size_t>(0)),
+       [=] __device__(size_t i) {
+         size_t seg = dh::SegmentId(key_segments_first, key_segments_last, i);
+-        return thrust::make_pair(seg, *(val_first + i));
++        return cuda::std::make_pair(seg, *(val_first + i));
+       });
+   size_t segments_len = key_segments_last - key_segments_first;
+   thrust::fill(exec, key_segments_out, key_segments_out + segments_len, 0);
+@@ -667,14 +668,14 @@ size_t SegmentedUniqueByKey(
+     SegInIt key_segments_first, SegInIt key_segments_last, KeyInIt key_first,
+     KeyInIt key_last, ValInIt val_first, SegOutIt key_segments_out,
+     ValOutIt val_out, Comp comp) {
+-  using Key =
+-      thrust::pair<size_t,
++  using Key =
++      cuda::std::pair<size_t,
+                    typename thrust::iterator_traits<KeyInIt>::value_type>;
+ 
+   auto unique_key_it = dh::MakeTransformIterator<Key>(
+       thrust::make_counting_iterator(static_cast<size_t>(0)),
+       [=] __device__(size_t i) {
+         size_t seg = dh::SegmentId(key_segments_first, key_segments_last, i);
+-        return thrust::make_pair(seg, *(key_first + i));
++        return cuda::std::make_pair(seg, *(key_first + i));
+       });
+   size_t segments_len = key_segments_last - key_segments_first;
+diff --git a/src/common/ranking_utils.cu b/src/common/ranking_utils.cu
+index 1234567..abcdefg 100644
+--- a/src/common/ranking_utils.cu
++++ b/src/common/ranking_utils.cu
+@@ -30,10 +30,10 @@ void CalcQueriesDCG(Context const* ctx, linalg::VectorView<float const> d_labels
+                     common::Span<bst_group_t const> d_group_ptr, std::size_t k,
+                     linalg::VectorView<double> out_dcg) {
+   CHECK_EQ(d_group_ptr.size() - 1, out_dcg.Size());
+-  using IdxGroup = thrust::pair<std::size_t, std::size_t>;
++  using IdxGroup = cuda::std::pair<std::size_t, std::size_t>;
+   auto group_it = dh::MakeTransformIterator<IdxGroup>(
+       thrust::make_counting_iterator(0ull), [=] XGBOOST_DEVICE(std::size_t idx) {
+-        return thrust::make_pair(idx, dh::SegmentId(d_group_ptr, idx));  // NOLINT
++        return cuda::std::make_pair(idx, dh::SegmentId(d_group_ptr, idx));  // NOLINT
+       });
+   auto value_it = dh::MakeTransformIterator<double>(
+       group_it,
+diff --git a/src/data/ellpack_page.cu b/src/data/ellpack_page.cu
+index 1234567..abcdefg 100644
+--- a/src/data/ellpack_page.cu
++++ b/src/data/ellpack_page.cu
+@@ -5,6 +5,7 @@
+ #include <thrust/extrema.h>                             // for max_element
+ #include <thrust/iterator/counting_iterator.h>          // for make_counting_iterator
+ #include <thrust/iterator/transform_output_iterator.h>  // for transform_output_iterator
++#include <cuda/std/iterator>                            // for distance
+ 
+ #include <algorithm>  // for copy
+ #include <limits>     // for numeric_limits
+@@ -74,13 +75,13 @@ if (kDenseCompressed && !HasNoMissing) {
+     auto row_beg = entries + row_ptrs[irow] - row_ptrs[0];
+     auto row_end = entries + row_ptrs[irow + 1] - row_ptrs[0];
+     auto it = thrust::make_transform_iterator(thrust::make_counting_iterator(0ul),
+                                               [=](std::size_t i) { return row_beg[i].index; });
+-    auto it_end = it + thrust::distance(row_beg, row_end);
++    auto it_end = it + cuda::std::distance(row_beg, row_end);
+     auto res_it = thrust::lower_bound(thrust::seq, it, it_end, cpr_fidx);
+     if (res_it == it_end || cpr_fidx != *res_it) {
+       wr.AtomicWriteSymbol(buffer, bin, (irow + base_row) * row_stride + cpr_fidx);
+       return;
+     }
+-    cpr_fidx = thrust::distance(it, res_it);
++    cpr_fidx = cuda::std::distance(it, res_it);
+     SPAN_CHECK(cpr_fidx < row_length);
+   }
+diff --git a/src/encoder/ordinal.cuh b/src/encoder/ordinal.cuh
+index 1234567..abcdefg 100644
+--- a/src/encoder/ordinal.cuh
++++ b/src/encoder/ordinal.cuh
+@@ -131,6 +131,13 @@ using DftDevicePolicy = Policy<cuda_impl::DftThrustPolicy, detail::DftErrorHandl
+  */
+ using DftDevicePolicy = Policy<cuda_impl::DftThrustPolicy, detail::DftErrorHandler>;
+ 
++// Functor for checking if value equals NotFound (CCCL 3.2 compatibility)
++struct IsNotFoundPredicate {
++  __device__ bool operator()(std::int32_t v) const {
++    return v == detail::NotFound();
++  }
++};
++
+ /**
+  * @brief Sort the categories for the training set. Returns a list of sorted index.
+  *
+@@ -283,9 +290,7 @@ void Recode(ExecPolicy const& policy, DeviceColumnsView const& orig_enc,
+       });
+ 
+   auto err_it = thrust::find_if(exec, dh::tcbegin(mapping), dh::tcend(mapping),
+-                                cuda::proclaim_return_type<bool>([=] __device__(std::int32_t v) {
+-                                  return v == detail::NotFound();
+-                                }));
++                                IsNotFoundPredicate{});
+ 
+   if (err_it != dh::tcend(mapping)) {
+     // Report missing cat.
+diff --git a/src/tree/gpu_hist/gradient_based_sampler.cu b/src/tree/gpu_hist/gradient_based_sampler.cu
+index 1234567..abcdefg 100644
+--- a/src/tree/gpu_hist/gradient_based_sampler.cu
++++ b/src/tree/gpu_hist/gradient_based_sampler.cu
+@@ -5,6 +5,7 @@
+ #include <thrust/random.h>
+ #include <thrust/sort.h>  // for sort
+ #include <thrust/transform.h>
++#include <cuda/std/iterator>  // for distance
+ #include <xgboost/host_device_vector.h>
+ #include <xgboost/logging.h>
+ 
+@@ -374,6 +375,6 @@
+                     SampleRateDelta(threshold, gpair.size(), sample_rows));
+   thrust::device_ptr<float> min =
+       thrust::min_element(cuctx->CTP(), dh::tbegin(grad_sum), dh::tend(grad_sum));
+-  return thrust::distance(dh::tbegin(grad_sum), min) + 1;
++  return cuda::std::distance(dh::tbegin(grad_sum), min) + 1;
+ }
+ };  // namespace xgboost::tree
+diff --git a/src/metric/auc.cu b/src/metric/auc.cu
+index a5f45d6..6dbb6e5 100644
+--- a/src/metric/auc.cu
++++ b/src/metric/auc.cu
+@@ -27,12 +27,12 @@ DMLC_REGISTRY_FILE_TAG(auc_gpu);
+ 
+ namespace {
+ // Pair of FP/TP
+-using Pair = thrust::pair<double, double>;
++using Pair = cuda::std::pair<double, double>;
+ 
+-template <typename T, typename U, typename P = thrust::pair<T, U>>
++template <typename T, typename U, typename P = cuda::std::pair<T, U>>
+ struct PairPlus {
+   XGBOOST_DEVICE P operator()(P const &l, P const &r) const {
+-    return thrust::make_pair(l.first + r.first, l.second + r.second);
++    return cuda::std::make_pair(l.first + r.first, l.second + r.second);
+   }
+ };
+ }  // namespace
+@@ -109,7 +109,7 @@ std::tuple<double, double, double> GPUBinaryAUC(Context const *ctx,
+     float fp = (1.0 - label) * w;
+     float tp = label * w;
+ 
+-    return thrust::make_pair(fp, tp);
++    return cuda::std::make_pair(fp, tp);
+   };  // NOLINT
+   auto d_fptp = dh::ToSpan(cache->fptp);
+   dh::LaunchN(d_sorted_idx.size(), ctx->CUDACtx()->Stream(),
+@@ -214,9 +214,9 @@ double ScaleClasses(Context const *ctx, bool is_column_split, common::Span<doubl
+   auto reduce_in = dh::MakeTransformIterator<Pair>(
+       thrust::make_counting_iterator(0), [=] XGBOOST_DEVICE(size_t i) {
+         if (local_area[i] > 0) {
+-          return thrust::make_pair(auc[i] / local_area[i] * tp[i], tp[i]);
++          return cuda::std::make_pair(auc[i] / local_area[i] * tp[i], tp[i]);
+         }
+-        return thrust::make_pair(std::numeric_limits<double>::quiet_NaN(), 0.0);
++        return cuda::std::make_pair(std::numeric_limits<double>::quiet_NaN(), 0.0);
+       });
+ 
+   double tp_sum;
+@@ -248,7 +248,7 @@ void SegmentedFPTP(Context const *ctx, common::Span<Pair> d_fptp, Fn segment_id)
+   auto fptp_it_out = thrust::make_transform_output_iterator(
+       dh::TypedDiscard<Triple>{}, [d_fptp] XGBOOST_DEVICE(Triple const &t) {
+         d_fptp[thrust::get<0>(t)] =
+-            thrust::make_pair(thrust::get<1>(t), thrust::get<2>(t));
++            cuda::std::make_pair(thrust::get<1>(t), thrust::get<2>(t));
+         return t;
+       });
+   common::InclusiveScan(
+@@ -351,7 +351,7 @@ double GPUMultiClassAUCOVR(Context const *ctx, MetaInfo const &info,
+     float w = get_weight[d_sorted_idx[i] % n_samples];
+     float fp = (1.0 - label) * w;
+     float tp = label * w;
+-    return thrust::make_pair(fp, tp);
++    return cuda::std::make_pair(fp, tp);
+   };  // NOLINT
+   dh::LaunchN(d_sorted_idx.size(),
+               [=] XGBOOST_DEVICE(size_t i) { d_fptp[i] = get_fp_tp(i); });
+@@ -361,11 +361,11 @@ double GPUMultiClassAUCOVR(Context const *ctx, MetaInfo const &info,
+    */
+   auto d_unique_idx = dh::ToSpan(cache->unique_idx);
+   dh::Iota(d_unique_idx, ctx->CUDACtx()->Stream());
+-  auto uni_key = dh::MakeTransformIterator<thrust::pair<uint32_t, float>>(
++  auto uni_key = dh::MakeTransformIterator<cuda::std::pair<uint32_t, float>>(
+       thrust::make_counting_iterator(0), [=] XGBOOST_DEVICE(size_t i) {
+         uint32_t class_id = i / n_samples;
+         float predt = d_predts_t[d_sorted_idx[i]];
+-        return thrust::make_pair(class_id, predt);
++        return cuda::std::make_pair(class_id, predt);
+       });
+ 
+   // unique values are sparse, so we need a CSR style indptr
+@@ -380,7 +380,7 @@ double GPUMultiClassAUCOVR(Context const *ctx, MetaInfo const &info,
+       dh::tbegin(d_unique_idx),
+       d_unique_class_ptr.data(),
+       dh::tbegin(d_unique_idx),
+-      thrust::equal_to<thrust::pair<uint32_t, float>>{});
++      thrust::equal_to<cuda::std::pair<uint32_t, float>>{});
+   d_unique_idx = d_unique_idx.subspan(0, n_uniques);
+ 
+   auto get_class_id = [=] XGBOOST_DEVICE(size_t idx) { return idx / n_samples; };
+@@ -536,7 +536,7 @@ std::pair<double, std::uint32_t> GPURankingAUC(Context const *ctx, common::Span<
+     // index.
+     i += data_group_begin;
+     j += data_group_begin;
+-    return thrust::make_pair(i, j);
++    return cuda::std::make_pair(i, j);
+   };  // NOLINT
+   auto in = dh::MakeTransformIterator<RankScanItem>(
+       thrust::make_counting_iterator(0), [=] XGBOOST_DEVICE(size_t idx) {
+@@ -619,7 +619,7 @@ std::tuple<double, double, double> GPUBinaryPRAUC(Context const *ctx,
+   auto it = dh::MakeTransformIterator<Pair>(
+       thrust::make_counting_iterator(0ul), [=] XGBOOST_DEVICE(size_t i) {
+         auto w = get_weight[d_sorted_idx[i]];
+-        return thrust::make_pair(labels(d_sorted_idx[i]) * w,
++        return cuda::std::make_pair(labels(d_sorted_idx[i]) * w,
+                                  (1.0f - labels(d_sorted_idx[i])) * w);
+       });
+   double total_pos, total_neg;
+@@ -667,13 +667,13 @@ double GPUMultiClassPRAUC(Context const *ctx, common::Span<float const> predts,
+                                           return i / n_samples;  // class id
+                                         });
+   auto get_weight = common::OptionalWeights{d_weights};
+-  auto val_it = dh::MakeTransformIterator<thrust::pair<double, double>>(
++  auto val_it = dh::MakeTransformIterator<cuda::std::pair<double, double>>(
+       thrust::make_counting_iterator(0ul), [=] XGBOOST_DEVICE(size_t i) {
+         auto idx = d_sorted_idx[i] % n_samples;
+         auto w = get_weight[idx];
+         auto class_id = i / n_samples;
+         auto y = labels(idx) == class_id;
+-        return thrust::make_pair(y * w, (1.0f - y) * w);
++        return cuda::std::make_pair(y * w, (1.0f - y) * w);
+       });
+   thrust::reduce_by_key(ctx->CUDACtx()->CTP(), key_it, key_it + predts.size(), val_it,
+                         thrust::make_discard_iterator(), totals.begin(), thrust::equal_to<size_t>{},
+@@ -724,7 +724,7 @@ std::pair<double, uint32_t> GPURankingPRAUCImpl(Context const *ctx,
+     float w = get_weight[group_id];
+     float fp = (1.0 - label) * w;
+     float tp = label * w;
+-    return thrust::make_pair(fp, tp);
++    return cuda::std::make_pair(fp, tp);
+   };  // NOLINT
+   dh::LaunchN(d_sorted_idx.size(), ctx->CUDACtx()->Stream(),
+               [=] XGBOOST_DEVICE(size_t i) { d_fptp[i] = get_fp_tp(i); });
+@@ -734,12 +734,12 @@ std::pair<double, uint32_t> GPURankingPRAUCImpl(Context const *ctx,
+    */
+   auto d_unique_idx = dh::ToSpan(cache->unique_idx);
+   dh::Iota(d_unique_idx, ctx->CUDACtx()->Stream());
+-  auto uni_key = dh::MakeTransformIterator<thrust::pair<uint32_t, float>>(
++  auto uni_key = dh::MakeTransformIterator<cuda::std::pair<uint32_t, float>>(
+       thrust::make_counting_iterator(0), [=] XGBOOST_DEVICE(size_t i) {
+         auto idx = d_sorted_idx[i];
+         bst_group_t group_id = dh::SegmentId(d_group_ptr, idx);
+         float predt = predts[idx];
+-        return thrust::make_pair(group_id, predt);
++        return cuda::std::make_pair(group_id, predt);
+       });
+ 
+   // unique values are sparse, so we need a CSR style indptr
+@@ -754,7 +754,7 @@ std::pair<double, uint32_t> GPURankingPRAUCImpl(Context const *ctx,
+       dh::tbegin(d_unique_idx),
+       d_unique_class_ptr.data(),
+       dh::tbegin(d_unique_idx),
+-      thrust::equal_to<thrust::pair<uint32_t, float>>{});
++      thrust::equal_to<cuda::std::pair<uint32_t, float>>{});
+   d_unique_idx = d_unique_idx.subspan(0, n_uniques);
+ 
+   auto get_group_id = [=] XGBOOST_DEVICE(size_t idx) {
+@@ -797,20 +797,20 @@ std::pair<double, uint32_t> GPURankingPRAUCImpl(Context const *ctx,
+   double auc;
+   uint32_t invalid_groups;
+   {
+-    auto it = dh::MakeTransformIterator<thrust::pair<double, uint32_t>>(
++    auto it = dh::MakeTransformIterator<cuda::std::pair<double, uint32_t>>(
+         thrust::make_counting_iterator(0ul), [=] XGBOOST_DEVICE(size_t g) {
+           double fp, tp;
+           thrust::tie(fp, tp) = d_fptp[common::LastOf(g, d_group_ptr)];
+           double area = fp * tp;
+           auto n_documents = d_group_ptr[g + 1] - d_group_ptr[g];
+           if (area > 0 && n_documents >= 2) {
+-            return thrust::make_pair(s_d_auc[g], static_cast<uint32_t>(0));
++            return cuda::std::make_pair(s_d_auc[g], static_cast<uint32_t>(0));
+           }
+-          return thrust::make_pair(0.0, static_cast<uint32_t>(1));
++          return cuda::std::make_pair(0.0, static_cast<uint32_t>(1));
+         });
+     thrust::tie(auc, invalid_groups) =
+         thrust::reduce(ctx->CUDACtx()->CTP(), it, it + n_groups,
+-                       thrust::pair<double, uint32_t>(0.0, 0), PairPlus<double, uint32_t>{});
++                       cuda::std::pair<double, uint32_t>(0.0, 0), PairPlus<double, uint32_t>{});
+   }
+   return std::make_pair(auc, n_groups - invalid_groups);
+ }
+@@ -848,7 +848,7 @@ std::pair<double, std::uint32_t> GPURankingPRAUC(Context const *ctx,
+    * Get total positive/negative for each group.
+    */
+   auto d_weights = info.weights_.ConstDeviceSpan();
+-  dh::caching_device_vector<thrust::pair<double, double>> totals(n_groups);
++  dh::caching_device_vector<cuda::std::pair<double, double>> totals(n_groups);
+   auto key_it = dh::MakeTransformIterator<size_t>(
+       thrust::make_counting_iterator(0ul),
+       [=] XGBOOST_DEVICE(size_t i) { return dh::SegmentId(d_group_ptr, i); });
+@@ -861,7 +861,7 @@ std::pair<double, std::uint32_t> GPURankingPRAUC(Context const *ctx,
+           w = d_weights[g];
+         }
+         auto y = labels(i);
+-        return thrust::make_pair(y * w, (1.0 - y) * w);
++        return cuda::std::make_pair(y * w, (1.0 - y) * w);
+       });
+   thrust::reduce_by_key(ctx->CUDACtx()->CTP(), key_it, key_it + predts.size(), val_it,
+                         thrust::make_discard_iterator(), totals.begin(), thrust::equal_to<size_t>{},
