@@ -1,5 +1,5 @@
 {% set version = "3.1.2" %}
-{% set build_number = 3 %}
+{% set build_number = 4 %}
 {% set python_min = "3.10" %}
 {% set posix = 'm2-' if win else '' %}
 
@@ -63,13 +63,6 @@ outputs:
       string: {{ string_prefix }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
       ignore_run_exports_from:
         - {{ compiler('cuda') }}  # [cuda_compiler_version != "None"]
-      missing_dso_whitelist:
-        # Conda-build raises the missing `R.dll` linkage erroneously.
-        # xref: https://github.com/conda/conda-build/pull/4786
-        - '*/R.dll'         # [win]
-        # Conda-build raises the missing `ld64.so.2` linkage erroneously.
-        # xref: https://github.com/conda/conda-build/issues/5403
-        - $RPATH/ld64.so.2  # [ppc64le]
     requirements:
       build:
         - {{ compiler('c') }}
@@ -124,14 +117,14 @@ outputs:
         - cross-python_{{ target_platform }} {{ python_min }}  # [build_platform != target_platform]
       host:
         - {{ pin_subpackage('libxgboost', max_pin='x.x.x') }}
-        - libxgboost =*={{ string_prefix }}_h*_{{ PKG_BUILDNUM }}
+        - libxgboost * {{ string_prefix }}_h*_{{ PKG_BUILDNUM }}
         - python {{ python_min }}
         - hatchling >=1.12.1
         - packaging >=21.3
         - pip
       run:
         - {{ pin_subpackage('libxgboost', max_pin='x.x.x') }}
-        - libxgboost =*={{ string_prefix }}_h*_{{ PKG_BUILDNUM }}
+        - libxgboost * {{ string_prefix }}_h*_{{ PKG_BUILDNUM }}
         - python >={{ python_min }}
         - numpy
         - scipy
@@ -156,11 +149,11 @@ outputs:
       host:
         - python {{ python_min }}
         - {{ pin_subpackage('py-xgboost', max_pin="x.x.x.x.x.x") }}
-        - py-xgboost =*={{ string_prefix }}_pyh*_{{ PKG_BUILDNUM }}
+        - py-xgboost * {{ string_prefix }}_pyh*_{{ PKG_BUILDNUM }}
       run:
         - python >={{ python_min }}
         - {{ pin_subpackage('py-xgboost', max_pin="x.x.x.x.x.x") }}
-        - py-xgboost =*={{ string_prefix }}_pyh*_{{ PKG_BUILDNUM }}
+        - py-xgboost * {{ string_prefix }}_pyh*_{{ PKG_BUILDNUM }}
     test:
       requires:
         - python {{ python_min }}
@@ -171,16 +164,15 @@ outputs:
     script: >-
       {{ "install-r-xgboost.sh" if not win else "install-win-wrapper.bat" }}
     build:
-      skip: true  # [r_base in ("4.1", "4.2")]
       string: {{ string_prefix }}_r{{ r_base | replace('.', '') }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      missing_dso_whitelist:
+        # Conda-build raises the missing `R.dll` linkage erroneously.
+        # xref: https://github.com/conda/conda-build/pull/4786
+        - '*/R.dll'         # [win]
       rpaths:
         - lib/R/lib
       force_use_keys:
         - librmm                  # [linux and cuda_compiler != "None"]
-      missing_dso_whitelist:
-        # Conda-build raises the missing `ld64.so.2` linkage erroneously.
-        # xref: https://github.com/conda/conda-build/issues/5403
-        - $RPATH/ld64.so.2  # [ppc64le]
     requirements:
       build:
         - {{ compiler('c') }}              # [unix]
@@ -203,7 +195,7 @@ outputs:
       host:
         - {{ pin_subpackage('libxgboost', max_pin='x.x.x') }}
         - libgomp                                                  # [win]
-        - libxgboost =*={{ string_prefix }}_h*_{{ PKG_BUILDNUM }}
+        - libxgboost * {{ string_prefix }}_h*_{{ PKG_BUILDNUM }}
         - r-base
         - r-matrix
         - r-data.table
@@ -213,7 +205,7 @@ outputs:
       run:
         - {{ pin_subpackage('libxgboost', max_pin='x.x.x') }}
         - libgomp                                                  # [win]
-        - libxgboost =*={{ string_prefix }}_h*_{{ PKG_BUILDNUM }}
+        - libxgboost * {{ string_prefix }}_h*_{{ PKG_BUILDNUM }}
         - r-base
         - r-matrix
         - r-data.table
