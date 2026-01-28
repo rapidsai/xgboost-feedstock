@@ -47,12 +47,14 @@ requirements:
   host:
     #######################################################################
     # Only use CCCL on Windows as RMM provides the CCCL we use on Linux.  #
+    # Also pin to CCCL 3 to workaround a compilation error.               #
     #                                                                     #
+    # xref: https://github.com/dmlc/xgboost/issues/11784                  #
     # xref: https://github.com/rapidsai/xgboost-feedstock/pull/85         #
     #######################################################################
-    - cccl                  # [win and cuda_compiler_version != "None"]
-    - nccl                  # [linux and cuda_compiler_version != "None"]
-    - librmm                # [linux and cuda_compiler_version != "None"]
+    - cccl >=3.0.0,<3.1.0a0  # [win and cuda_compiler_version != "None"]
+    - nccl                   # [linux and cuda_compiler_version != "None"]
+    - librmm                 # [linux and cuda_compiler_version != "None"]
 
 outputs:
   - name: libxgboost
