@@ -1,0 +1,28 @@
+From 0f5f0d975db4770f61a1e97519c6f42214190dbf Mon Sep 17 00:00:00 2001
+From: Hyunsu Cho <phcho@nvidia.com>
+Date: Thu, 26 Feb 2026 01:11:14 -0800
+Subject: [PATCH] Drop old CUDA archs
+
+---
+ cmake/Utils.cmake | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/cmake/Utils.cmake b/cmake/Utils.cmake
+index d62592195..cc59362bb 100644
+--- a/cmake/Utils.cmake
++++ b/cmake/Utils.cmake
+@@ -70,10 +70,8 @@ function(compute_cmake_cuda_archs archs)
+   # Set up defaults based on CUDA varsion
+   # Remember to update arch-specific tunings when supporting new archs.
+   if(NOT CMAKE_CUDA_ARCHITECTURES)
+-    if(CUDA_VERSION VERSION_GREATER_EQUAL "13.0")
++    if(CUDA_VERSION VERSION_GREATER_EQUAL "12.8")
+       set(CMAKE_CUDA_ARCHITECTURES 75 80 90 100 120)
+-    elseif(CUDA_VERSION VERSION_GREATER_EQUAL "12.8")
+-      set(CMAKE_CUDA_ARCHITECTURES 50 60 70 80 90 100 120)
+     elseif(CUDA_VERSION VERSION_GREATER_EQUAL "11.8")
+       set(CMAKE_CUDA_ARCHITECTURES 50 60 70 80 90)
+     elseif(CUDA_VERSION VERSION_GREATER_EQUAL "11.0")
+-- 
+2.43.0
+
