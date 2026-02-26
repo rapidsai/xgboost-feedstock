@@ -15,6 +15,7 @@ then
     )
 fi
 if [[ ${cuda_compiler_version} != "None" ]]; then
+    export CUDAARCHS="75;80;86;89;90;100;103;120;121"
     XGB_CMAKE_ARGS=(
         -DUSE_CUDA:BOOL=ON
         -DUSE_NCCL:BOOL=ON
