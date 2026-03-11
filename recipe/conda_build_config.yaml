@@ -1,21 +1,6 @@
 librmm:            # [linux]
   - 26.04          # [linux]
 
-cuda_compiler_version:     # [linux]
-  - 12.9                   # [linux]
-
-c_stdlib_version:          # [linux]
-  - "2.28"                 # [linux]
-
-c_compiler_version:        # [linux]
-  - 14                     # [linux]
-
-cxx_compiler_version:      # [linux]
-  - 14                     # [linux]
-
-fortran_compiler_version:  # [linux]
-  - 14                     # [linux]
-
 channel_sources:
   - rapidsai-nightly,rapidsai,conda-forge
 channel_targets:
