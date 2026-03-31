@@ -1,0 +1,30 @@
+From 93ffb2a79899d451fadfaed21ea0cc44dd47b3f9 Mon Sep 17 00:00:00 2001
+From: Hyunsu Cho <phcho@nvidia.com>
+Date: Mon, 30 Mar 2026 21:19:30 -0700
+Subject: [PATCH] Fix missing include
+
+---
+ src/tree/gpu_hist/histogram.cu | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/src/tree/gpu_hist/histogram.cu b/src/tree/gpu_hist/histogram.cu
+index 55f4479d1..eefb9b0a3 100644
+--- a/src/tree/gpu_hist/histogram.cu
++++ b/src/tree/gpu_hist/histogram.cu
+@@ -5,9 +5,10 @@
+ #include <thrust/iterator/transform_iterator.h>  // for make_transform_iterator
+ 
+ #include <algorithm>
+-#include <cstdint>          // uint32_t, int32_t
+-#include <cuda/functional>  // for proclaim_copyable_arguments
+-#include <memory>           // for unique_ptr
++#include <cstdint>               // uint32_t, int32_t
++#include <cuda/functional>       // for proclaim_copyable_arguments
++#include <cuda/std/type_traits>  // for cuda::std::alignment_of_v
++#include <memory>                // for unique_ptr
+ 
+ #include "../../collective/aggregator.h"
+ #include "../../common/cuda_context.cuh"  // for CUDAContext
+-- 
+2.43.0
+
