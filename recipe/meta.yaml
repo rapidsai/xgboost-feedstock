@@ -1,5 +1,5 @@
 {% set version = "3.2.0" %}
-{% set build_number = 2 %}
+{% set build_number = 3 %}
 {% set python_min = "3.10" %}
 {% set posix = 'm2-' if win else '' %}
 
@@ -24,9 +24,12 @@ build:
   number: {{ build_number }}
   # Skip if `python_min` is undefined. This ensures re-rendering picks it up.
   #
+  # Skip CPU-only builds when CUDA builds are available. Instead make CUDA
+  # builds work both for CPU-only and GPU use cases.
+  #
   # Skip GLIBC 2.17 (as used in conda-forge) since RAPIDS is GLIBC 2.28+ only.
   # ref: https://docs.rapids.ai/notices/rsn0037/
-  skip: true  # [((linux or win) and cuda_compiler_version == "None") or (not python_min) or (c_stdlib_version == "2.17")]
+  skip: true  # [(not python_min) or ((linux or win) and cuda_compiler_version == "None") or (c_stdlib_version == "2.17")]
 
 requirements:
   build:
