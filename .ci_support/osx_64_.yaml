@@ -14,8 +14,6 @@ channel_sources:
 - rapidsai-nightly,rapidsai,conda-forge
 channel_targets:
 - rapidsai-nightly main
-cuda_compiler:
-- cuda-nvcc
 cuda_compiler_version:
 - None
 cxx_compiler:
