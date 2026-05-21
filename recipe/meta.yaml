@@ -103,7 +103,7 @@ outputs:
       noarch: python
       string: {{ string_prefix }}_pyh{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
       force_use_keys:
-        - librmm                  # [linux and cuda_compiler != "None"]
+        - librmm                  # [linux and cuda_compiler_version != "None"]
       script_env:
         # Workaround an upstream conda-build issue w/pip & `outputs` by setting env vars manually.
         # xref: https://github.com/conda/conda-build/issues/3993
@@ -145,7 +145,7 @@ outputs:
       noarch: python
       string: {{ string_prefix }}_pyh{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
       force_use_keys:
-        - librmm                  # [linux and cuda_compiler != "None"]
+        - librmm                  # [linux and cuda_compiler_version != "None"]
     requirements:
       host:
         - python {{ python_min }}
@@ -173,7 +173,7 @@ outputs:
       rpaths:
         - lib/R/lib
       force_use_keys:
-        - librmm                  # [linux and cuda_compiler != "None"]
+        - librmm                  # [linux and cuda_compiler_version != "None"]
     requirements:
       build:
         - {{ compiler('c') }}              # [unix]
