@@ -30,7 +30,7 @@ jobs:
             os: ubuntu
             runs_on: ['ubuntu-latest']
             DOCKER_IMAGE: quay.io/condaforge/linux-anvil-x86_64:alma9
-          - CONFIG: linux_64_c_stdlib_version2.28cuda_compiler_version13.1
+          - CONFIG: linux_64_c_stdlib_version2.28cuda_compiler_version13.2
             STORE_BUILD_ARTIFACTS: False
             UPLOAD_PACKAGES: True
             os: ubuntu
@@ -42,7 +42,7 @@ jobs:
             os: ubuntu
             runs_on: ['ubuntu-latest']
             DOCKER_IMAGE: quay.io/condaforge/linux-anvil-x86_64:alma9
-          - CONFIG: linux_aarch64_c_stdlib_version2.28cuda_compiler_version13.1
+          - CONFIG: linux_aarch64_c_stdlib_version2.28cuda_compiler_version13.2
             STORE_BUILD_ARTIFACTS: False
             UPLOAD_PACKAGES: True
             os: ubuntu
@@ -63,7 +63,7 @@ jobs:
             UPLOAD_PACKAGES: True
             os: windows
             runs_on: ['windows-latest']
-          - CONFIG: win_64_cuda_compiler_version13.1
+          - CONFIG: win_64_cuda_compiler_version13.2
             STORE_BUILD_ARTIFACTS: False
             UPLOAD_PACKAGES: True
             os: windows

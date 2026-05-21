@@ -50,9 +50,9 @@ requirements:
     #######################################################################
     # Only use CCCL on Windows as RMM provides the CCCL we use on Linux.  #
     #######################################################################
-    - cccl         # [win and cuda_compiler_version != "None"]
-    - nccl         # [linux and cuda_compiler_version != "None"]
-    - librmm       # [linux and cuda_compiler_version != "None"]
+    - cccl                   # [win and cuda_compiler_version != "None"]
+    - nccl                   # [linux and cuda_compiler_version != "None"]
+    - librmm                 # [linux and cuda_compiler_version != "None"]
 
 outputs:
   - name: libxgboost
