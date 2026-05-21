@@ -7,7 +7,8 @@ set XGB_CMAKE_ARGS=""
 if not "%cuda_compiler_version%" == "None" (
     set "XGB_CMAKE_ARGS=-DUSE_CUDA:BOOL=ON"
     if "%cuda_compiler_version%" == "12.9" (
-        rem Disable sm_60 to work around NVIDIA/cccl#7982
+        rem RAPIDS requires Volta or newer.
+        rem ref: https://docs.rapids.ai/notices/rsn0034/
         set "CUDAARCHS=70;75;80;86;89;90;100;103;120;121"
     )
 )

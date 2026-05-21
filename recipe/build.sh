@@ -16,7 +16,8 @@ then
 fi
 if [[ ${cuda_compiler_version} != "None" ]]; then
     if [[ ${cuda_compiler_version} == "12.9" ]]; then
-        # Disable sm_60 to work around NVIDIA/cccl#7982
+        # RAPIDS requires Volta or newer.
+        # ref: https://docs.rapids.ai/notices/rsn0034/
         export CUDAARCHS="70;75;80;86;89;90;100;103;120;121"
     fi
     XGB_CMAKE_ARGS=(
