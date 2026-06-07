@@ -1,5 +1,5 @@
 {% set version = "3.2.0" %}
-{% set build_number = 5 %}
+{% set build_number = 6 %}
 {% set python_min = "3.10" %}
 {% set posix = 'm2-' if win else '' %}
 
@@ -18,7 +18,8 @@ source:
     - patches/0002-Remove-nvidia-nccl-cu12-from-pyproject.toml.patch
     - patches/0003-Mark-wheels-as-any-platform-compatible.patch
     - patches/0004-Fix-compilation-with-the-latest-CCCL.patch
-    - patches/0005-Fix-missing-include.patch
+    - patches/0005-Update-types-for-CTK-13.3-12230.patch
+    - patches/0006-Fix-missing-include.patch
 
 build:
   number: {{ build_number }}
