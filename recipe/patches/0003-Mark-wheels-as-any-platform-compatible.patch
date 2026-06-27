@@ -1,7 +1,7 @@
-From de2126f02f7288e3de9bb251c8c718d153112d67 Mon Sep 17 00:00:00 2001
+From 4d23fe7fd94bd8591c6eec8073655d719918d175 Mon Sep 17 00:00:00 2001
 From: "Uwe L. Korn" <uwe.korn@quantco.com>
 Date: Sat, 28 Sep 2024 21:12:02 +0200
-Subject: [PATCH 3/6] Mark wheels as any platform compatible
+Subject: [PATCH 3/4] Mark wheels as any platform compatible
 
 ---
  python-package/hatch_build.py | 4 +---
