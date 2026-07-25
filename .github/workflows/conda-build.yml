@@ -6,7 +6,7 @@ name: Build conda package
 on:
   push:
     branches:
-      - main
+      - release/26.08
 
   pull_request:
 
@@ -119,7 +119,7 @@ jobs:
     steps:
 
     - name: Checkout code
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
     - name: Manage disk space
       env:
@@ -146,7 +146,7 @@ jobs:
         CONFIG: ${{ matrix.CONFIG }}
         MINIFORGE_HOME: ${{ matrix.tools_install_dir }}
         DOCKER_IMAGE: ${{ matrix.DOCKER_IMAGE }}
-        UPLOAD_ON_BRANCH: main
+        UPLOAD_ON_BRANCH: release/26.08
         UPLOAD_PACKAGES: ${{ matrix.UPLOAD_PACKAGES }}
         RATTLER_BUILD_COLOR: always
         RATTLER_BUILD_ENABLE_GITHUB_INTEGRATION: 'true'
@@ -155,7 +155,7 @@ jobs:
       run: |
         export CONDA_BLD_PATH="${CONDA_BLD_PATH/#~/${HOME}}"
         export FEEDSTOCK_NAME="$(basename $GITHUB_REPOSITORY)"
-        export GIT_BRANCH="$(basename $GITHUB_REF)"
+        export GIT_BRANCH="${GITHUB_REF_NAME}"
         export MINIFORGE_HOME="${MINIFORGE_HOME/#~/${HOME}}"
         export flow_run_id="github_$GITHUB_RUN_ID"
         export remote_url="https://github.com/$GITHUB_REPOSITORY"
@@ -175,7 +175,7 @@ jobs:
         CONDA_BLD_PATH: ${{ matrix.build_workspace_dir }}
         CONFIG: ${{ matrix.CONFIG }}
         MINIFORGE_HOME: ${{ matrix.tools_install_dir }}
-        UPLOAD_ON_BRANCH: main
+        UPLOAD_ON_BRANCH: release/26.08
         UPLOAD_PACKAGES: ${{ matrix.UPLOAD_PACKAGES }}
         RATTLER_BUILD_COLOR: always
         RATTLER_BUILD_ENABLE_GITHUB_INTEGRATION: 'true'
@@ -184,7 +184,7 @@ jobs:
       run: |
         export CONDA_BLD_PATH="${CONDA_BLD_PATH/#~/${HOME}}"
         export FEEDSTOCK_NAME="$(basename $GITHUB_REPOSITORY)"
-        export GIT_BRANCH="$(basename $GITHUB_REF)"
+        export GIT_BRANCH="${GITHUB_REF_NAME}"
         export MINIFORGE_HOME="${MINIFORGE_HOME/#~/${HOME}}"
         export flow_run_id="github_$GITHUB_RUN_ID"
         export remote_url="https://github.com/$GITHUB_REPOSITORY"
@@ -211,7 +211,7 @@ jobs:
         CONFIG: ${{ matrix.CONFIG }}
         MINIFORGE_HOME: ${{ matrix.tools_install_dir }}
         PYTHONUNBUFFERED: 1
-        UPLOAD_ON_BRANCH: main
+        UPLOAD_ON_BRANCH: release/26.08
         UPLOAD_PACKAGES: ${{ matrix.UPLOAD_PACKAGES }}
         RATTLER_BUILD_COLOR: always
         RATTLER_BUILD_ENABLE_GITHUB_INTEGRATION: 'true'

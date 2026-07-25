@@ -18,7 +18,7 @@ provider:
   osx: github_actions
   win: github_actions
 test: native
-upload_on_branch: main
+upload_on_branch: release/26.08
 workflow_settings:
   free_disk_space:
     - platform: [linux_64, linux_aarch64]

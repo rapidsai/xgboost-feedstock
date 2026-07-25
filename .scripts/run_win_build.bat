@@ -85,7 +85,7 @@ call :end_group
 :: Prepare some environment variables for the upload step
 if /i "%CI%" == "github_actions" (
     set "FEEDSTOCK_NAME=%GITHUB_REPOSITORY:*/=%"
-    set "GIT_BRANCH=%GITHUB_REF:refs/heads/=%"
+    set "GIT_BRANCH=%GITHUB_REF_NAME%"
     if /i "%GITHUB_EVENT_NAME%" == "pull_request" (
         set "IS_PR_BUILD=True"
     ) else (
@@ -103,7 +103,7 @@ if /i "%CI%" == "azure" (
     )
     set "TEMP=%UPLOAD_TEMP%"
 )
-set "UPLOAD_ON_BRANCH=main"
+set "UPLOAD_ON_BRANCH=release/26.08"
 :: Note, this needs GIT_BRANCH too
 
 :: Validate
