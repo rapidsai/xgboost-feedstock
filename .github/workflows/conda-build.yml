@@ -119,7 +119,7 @@ jobs:
     steps:
 
     - name: Checkout code
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
     - name: Manage disk space
       env:
@@ -155,7 +155,7 @@ jobs:
       run: |
         export CONDA_BLD_PATH="${CONDA_BLD_PATH/#~/${HOME}}"
         export FEEDSTOCK_NAME="$(basename $GITHUB_REPOSITORY)"
-        export GIT_BRANCH="$(basename $GITHUB_REF)"
+        export GIT_BRANCH="${GITHUB_REF_NAME}"
         export MINIFORGE_HOME="${MINIFORGE_HOME/#~/${HOME}}"
         export flow_run_id="github_$GITHUB_RUN_ID"
         export remote_url="https://github.com/$GITHUB_REPOSITORY"
@@ -184,7 +184,7 @@ jobs:
       run: |
         export CONDA_BLD_PATH="${CONDA_BLD_PATH/#~/${HOME}}"
         export FEEDSTOCK_NAME="$(basename $GITHUB_REPOSITORY)"
-        export GIT_BRANCH="$(basename $GITHUB_REF)"
+        export GIT_BRANCH="${GITHUB_REF_NAME}"
         export MINIFORGE_HOME="${MINIFORGE_HOME/#~/${HOME}}"
         export flow_run_id="github_$GITHUB_RUN_ID"
         export remote_url="https://github.com/$GITHUB_REPOSITORY"
