@@ -57,31 +57,73 @@ conda config --add channels rapidsai-nightly
 conda config --set channel_priority strict
 ```
 
-Once the `rapidsai-nightly` channel has been enabled, `libxgboost, py-xgboost, r-xgboost, xgboost` can be installed with `conda`:
+How to use
+----------
+
+<details>
+<summary>With conda</summary>
 
 ```
 conda install libxgboost py-xgboost r-xgboost xgboost
 ```
 
-or with `mamba`:
+</details>
+
+<details>
+<summary>With mamba</summary>
 
 ```
 mamba install libxgboost py-xgboost r-xgboost xgboost
 ```
 
-It is possible to list all of the versions of `libxgboost` available on your platform with `conda`:
+</details>
+
+<details>
+<summary>With pixi</summary>
+
+```
+# for adding to your local project
+pixi add libxgboost py-xgboost r-xgboost xgboost
+# for installing globally
+pixi global install libxgboost py-xgboost r-xgboost xgboost
+```
+
+</details>
+
+Search package versions
+-----------------------
+
+It is possible to list all of the versions of `libxgboost` available on your platform:
+
+<details>
+<summary>With conda</summary>
 
 ```
 conda search libxgboost --channel rapidsai-nightly
 ```
 
-or with `mamba`:
+</details>
+
+<details>
+<summary>With mamba</summary>
 
 ```
 mamba search libxgboost --channel rapidsai-nightly
 ```
 
-Alternatively, `mamba repoquery` may provide more information:
+</details>
+
+<details>
+<summary>With pixi</summary>
+
+```
+pixi search libxgboost --channel rapidsai-nightly
+```
+
+</details>
+
+<details>
+<summary>With mamba repoquery, which may provide more information</summary>
 
 ```
 # Search all versions available on your platform:
@@ -93,6 +135,8 @@ mamba repoquery whoneeds libxgboost --channel rapidsai-nightly
 # List dependencies of `libxgboost`:
 mamba repoquery depends libxgboost --channel rapidsai-nightly
 ```
+
+</details>
 
 
 
@@ -122,7 +166,7 @@ In order to produce a uniquely identifiable distribution:
 Feedstock Maintainers
 =====================
 
-* [@hcho3](https://github.com/hcho3/)
+* [@chyunsu3](https://github.com/chyunsu3/)
 * [@jakirkham](https://github.com/jakirkham/)
 * [@trivialfis](https://github.com/trivialfis/)
 
