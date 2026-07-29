@@ -1,6 +1,6 @@
 {% set version = "3.3.0" %}
-{% set build_number = 4 %}
-{% set python_min = "3.12" %}
+{% set build_number = 5 %}
+{% set python_min = "3.11" %}
 {% set posix = 'm2-' if win else '' %}
 
 {% set string_prefix = "rapidsai" %}
@@ -234,6 +234,6 @@ about:
 extra:
   feedstock-name: xgboost
   recipe-maintainers:
+    - chyunsu3
     - trivialfis
-    - hcho3
     - jakirkham
