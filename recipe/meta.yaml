@@ -231,6 +231,8 @@ about:
     environment (Hadoop, SGE, MPI) and can solve problems beyond billions of examples.
   doc_url: https://xgboost.readthedocs.io/
   dev_url: https://github.com/dmlc/xgboost/
+  prelink_message:
+    - prelink_rapids_xgboost_deprecation.txt
 
 extra:
   feedstock-name: xgboost
