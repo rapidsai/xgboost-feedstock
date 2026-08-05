@@ -1,7 +1,11 @@
-RAPIDS XGBoost is deprecated
+RAPIDS XGBoost is Deprecated
 
-As of RAPIDS 26.08, RAPIDS XGBoost is deprecated. Going forward XGBoost
-packages will be available via conda-forge. These can be installed like so:
+As of RAPIDS 26.08, RAPIDS XGBoost is deprecated. More details in RSN 62:
+
+https://docs.rapids.ai/notices/rsn0062/
+
+Going forward XGBoost packages will be available via conda-forge. These can be
+installed like so:
 
 conda install -c conda-forge cuda-version=<CUDA version> xgboost
 
