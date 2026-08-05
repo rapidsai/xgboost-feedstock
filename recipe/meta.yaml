@@ -19,6 +19,7 @@ source:
     - patches/0003-Mark-wheels-as-any-platform-compatible.patch
     - patches/0004-Include-cuda-std-type_traits-in-histogram.cu.patch
     - patches/0005-Add-back-support-for-Python-3.11.patch
+    - patches/0006-Add-deprecation-warning.patch
 
 build:
   number: {{ build_number }}
