@@ -97,6 +97,7 @@ jobs:
           - CONFIG: win_64_cuda_compiler_version12.9
             STORE_BUILD_ARTIFACTS: False
             UPLOAD_PACKAGES: True
+            build_platform: win-64
             build_workspace_dir: D:\\bld\\
             docker_run_args: 
             free_disk_space: skip
@@ -108,6 +109,7 @@ jobs:
           - CONFIG: win_64_cuda_compiler_version13.3
             STORE_BUILD_ARTIFACTS: False
             UPLOAD_PACKAGES: True
+            build_platform: win-64
             build_workspace_dir: D:\\bld\\
             docker_run_args: 
             free_disk_space: skip
@@ -119,7 +121,7 @@ jobs:
     steps:
 
     - name: Checkout code
-      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
     - name: Manage disk space
       env:
@@ -206,6 +208,7 @@ jobs:
         set "sha=%GITHUB_SHA%"
         call ".scripts\run_win_build.bat"
       env:
+        BUILD_PLATFORM: ${{ matrix.build_platform }}
         CI: github_actions
         CONDA_BLD_PATH: ${{ matrix.build_workspace_dir }}
         CONFIG: ${{ matrix.CONFIG }}

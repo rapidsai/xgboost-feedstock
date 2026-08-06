@@ -1,0 +1,22 @@
+RAPIDS XGBoost is Deprecated
+
+As of RAPIDS 26.08, RAPIDS XGBoost is deprecated. More details in RSN 62:
+
+https://docs.rapids.ai/notices/rsn0062/
+
+Going forward XGBoost packages will be available via conda-forge. These can be
+installed like so:
+
+conda install -c conda-forge cuda-version=<CUDA version> xgboost
+
+More details can be found on the conda-forge XGBoost README:
+
+https://github.com/conda-forge/xgboost-feedstock/tree/main#installing-xgboost
+
+Note that the `__cuda` virtual package must be present either by having an
+NVIDIA GPU with the driver installed or setting the environment variable
+`CONDA_OVERRIDE_CUDA` to the intended CUDA version.
+
+More details in the Conda virtual package docs:
+
+https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-virtual.html#managing-virtual-packages
